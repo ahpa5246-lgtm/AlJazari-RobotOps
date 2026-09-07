@@ -23,18 +23,20 @@ Open `http://localhost:3000`.
 - `GET /api/health`
 - `GET /api/fleet?search=&status=&clientId=`
 - `GET /api/robots/:id?clientId=`
+- `GET /api/alerts?clientId=`
+- `POST /api/alerts/:id/acknowledge` with `{ "actor": "demo-technician", "confirmed": true }`
 - `POST /api/simulator/faults` with `{ "robotId": "AJR-002", "fault": "wheel-friction", "confirmed": true }`
 
-The POST endpoint mutates the simulator only and cannot issue physical commands.
+Both POST endpoints mutate in-memory demo state only and cannot issue physical commands. Alert acknowledgement requires an explicit human actor and confirmation.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, seven deterministic domain tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, nine deterministic domain tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
 - In-memory demo persistence only.
-- Authentication/RBAC and database adapters are architecture gates for a later milestone.
+- Alert state, cooldown and acknowledgements are in-memory only; authentication/RBAC and database adapters are later architecture gates.
 - Health and anomaly rules are transparent prototype heuristics, not validated failure prediction.
 - Canvas topology is a progressive visualization; the semantic fleet registry remains available without it.
 
