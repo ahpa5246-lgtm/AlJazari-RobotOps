@@ -2,11 +2,13 @@ import { calculateHealth, detectAnomalies } from "./analytics.js";
 import { SimulatorAdapter } from "./simulator.js";
 import { assertRobotAdapter } from "./robot-adapter.js";
 import { AlertEngine } from "./alert-engine.js";
+import { MaintenanceWorkflow } from "./maintenance-workflow.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine()) {
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow()) {
     this.adapter = assertRobotAdapter(adapter);
     this.alertEngine = alertEngine;
+    this.maintenanceWorkflow = maintenanceWorkflow;
   }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
@@ -19,12 +21,18 @@ export class FleetService {
       .filter((robot) => !status || robot.operationalState === status)
       .filter((robot) => !normalizedSearch || [robot.id, robot.serialNumber, robot.model, robot.clientName, robot.siteName].some((value) => value.toLowerCase().includes(normalizedSearch)));
 
+    const alerts = this.alertEngine.list().filter((alert) => robots.some((robot) => robot.id === alert.robotId));
+    const robotIds = new Set(robots.map((robot) => robot.id));
     return {
       generatedAt: robots[0]?.telemetry.observedAt ?? new Date().toISOString(),
       simulated: true,
       source: this.adapter.describe(),
       totals: deriveTotals(robots),
-      alerts: this.alertEngine.list().filter((alert) => robots.some((robot) => robot.id === alert.robotId)),
+      alerts,
+      maintenance: {
+        suggestions: this.maintenanceWorkflow.listSuggestions(alerts),
+        tickets: this.maintenanceWorkflow.listTickets().filter((ticket) => robotIds.has(ticket.robotId))
+      },
       robots
     };
   }
@@ -38,7 +46,8 @@ export class FleetService {
     return {
       ...decorated,
       history: this.adapter.telemetry(robotId).slice(-30),
-      alerts: this.alertEngine.list({ robotId })
+      alerts: this.alertEngine.list({ robotId }),
+      maintenance: this.maintenance({ ...tenant, robotId })
     };
   }
 
@@ -55,6 +64,21 @@ export class FleetService {
     const visible = this.alertEngine.list(tenant).some((alert) => alert.id === alertId);
     if (!visible) throw new Error("Alert not found in tenant");
     return this.alertEngine.acknowledge(alertId, acknowledgement);
+  }
+
+  maintenance(tenant = {}) {
+    const alerts = this.alertEngine.list(tenant);
+    return {
+      simulated: true,
+      suggestions: this.maintenanceWorkflow.listSuggestions(alerts),
+      tickets: this.maintenanceWorkflow.listTickets(tenant)
+    };
+  }
+
+  confirmMaintenanceTicket(alertId, confirmation, tenant = {}) {
+    const alert = this.alertEngine.list(tenant).find((item) => item.id === alertId);
+    if (!alert) throw new Error("Alert not found in tenant");
+    return this.maintenanceWorkflow.confirm(alert, confirmation);
   }
 
   #decorate(robot) {
