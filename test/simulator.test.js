@@ -6,6 +6,7 @@ import { calculateHealth } from "../src/analytics.js";
 import { assertRobotAdapter } from "../src/robot-adapter.js";
 import { AlertEngine } from "../src/alert-engine.js";
 import { MaintenanceWorkflow } from "../src/maintenance-workflow.js";
+import { IncidentReplay } from "../src/incident-replay.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -140,4 +141,50 @@ test("maintenance tickets require human confirmation, remain tenant scoped and p
   assert.equal(repeated.ticket.id, first.ticket.id);
   assert.equal(workflow.listTickets({ clientId: "client-1" }).length, 1);
   assert.equal(workflow.listTickets({ clientId: "another-client" }).length, 0);
+});
+
+
+test("incident replay is deterministic and derives its trigger window from telemetry", () => {
+  const replay = new IncidentReplay({ windowSize: 4 });
+  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
+  const history = [
+    { observedAt: "2026-09-07T20:00:00.000Z", batteryPercentage: 80, motorCurrent: 2.5, motorTemperature: 44, localizationQuality: 90, networkLatency: 50, mission: { state: "working" }, position: { x: 1, y: 1, orientation: 0 } },
+    { observedAt: "2026-09-07T20:00:30.000Z", batteryPercentage: 79, motorCurrent: 2.7, motorTemperature: 45, localizationQuality: 89, networkLatency: 55, mission: { state: "working" }, position: { x: 2, y: 1, orientation: .2 } },
+    { observedAt: "2026-09-07T20:01:00.000Z", batteryPercentage: 78, motorCurrent: 6.4, motorTemperature: 46, localizationQuality: 88, networkLatency: 58, mission: { state: "working" }, position: { x: 3, y: 2, orientation: .4 } }
+  ];
+  const alert = acknowledgedAlert({ lastSeenAt: "2026-09-07T20:01:00.000Z", evidence: { metric: "motorCurrent", value: 6.4, threshold: 5.6, baselineMean: 2.6, zScore: 8, observedAt: "2026-09-07T20:01:00.000Z" } });
+
+  const first = replay.build(robot, history, alert);
+  const second = replay.build(robot, history, alert);
+  assert.deepEqual(first, second);
+  assert.equal(first.sampleCount, 3);
+  assert.equal(first.events.at(-1).codes.includes("MOTOR_CURRENT_HIGH"), true);
+  assert.equal(first.trajectory.length, 3);
+  assert.equal(first.spatialReplayAvailable, true);
+  assert.equal(first.physicalControl, false);
+  assert.equal(first.causalConclusion, null);
+});
+
+test("incident replay retains a telemetry timeline when pose is unsupported", () => {
+  const replay = new IncidentReplay();
+  const robot = { id: "AJR-003", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
+  const alert = acknowledgedAlert({ id: "ALT-AJR-003-NETWORK_LATENCY_HIGH", robotId: "AJR-003", code: "NETWORK_LATENCY_HIGH", severity: "warning", evidence: { metric: "networkLatency", value: 520, threshold: 420, baselineMean: 60, zScore: 10, observedAt: "2026-09-07T20:00:30.000Z" } });
+  const history = [
+    { observedAt: "2026-09-07T20:00:00.000Z", batteryPercentage: 80, motorCurrent: null, motorTemperature: null, localizationQuality: null, networkLatency: 60, mission: null, position: null },
+    { observedAt: "2026-09-07T20:00:30.000Z", batteryPercentage: 79, motorCurrent: null, motorTemperature: null, localizationQuality: null, networkLatency: 520, mission: null, position: null }
+  ];
+  const incident = replay.build(robot, history, alert);
+  assert.equal(incident.events.length, 2);
+  assert.equal(incident.trajectory.length, 0);
+  assert.equal(incident.spatialReplayAvailable, false);
+  assert.match(incident.capabilityNotice, /Pose history is unsupported/);
+});
+
+test("fleet incident queries enforce tenant scope", () => {
+  const service = new FleetService(new SimulatorAdapter());
+  service.injectFault("AJR-002", "wheel-friction");
+  const visible = service.incidents({ organizationId: "org-aljazari-demo", clientId: "client-rashid" });
+  const hidden = service.incidents({ organizationId: "org-aljazari-demo", clientId: "client-sindbad" });
+  assert.equal(visible.some((incident) => incident.robotId === "AJR-002"), true);
+  assert.equal(hidden.some((incident) => incident.robotId === "AJR-002"), false);
 });
