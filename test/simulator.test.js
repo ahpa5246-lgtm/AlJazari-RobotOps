@@ -5,6 +5,7 @@ import { FleetService } from "../src/fleet-service.js";
 import { calculateHealth } from "../src/analytics.js";
 import { assertRobotAdapter } from "../src/robot-adapter.js";
 import { AlertEngine } from "../src/alert-engine.js";
+import { MaintenanceWorkflow } from "../src/maintenance-workflow.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -91,4 +92,52 @@ test("alert acknowledgement is explicit, human-attributed and does not trigger c
   assert.equal(acknowledged.acknowledgement.humanConfirmed, true);
   assert.equal(acknowledged.acknowledgement.actor, "demo-technician");
   assert.equal(acknowledged.simulated, true);
+});
+
+
+function acknowledgedAlert(overrides = {}) {
+  return {
+    id: "ALT-AJR-002-DRIVETRAIN_CURRENT_HIGH",
+    organizationId: "org-1",
+    clientId: "client-1",
+    siteId: "site-1",
+    robotId: "AJR-002",
+    code: "DRIVETRAIN_CURRENT_HIGH",
+    severity: "high",
+    status: "acknowledged",
+    lastSeenAt: "2026-09-07T20:00:00.000Z",
+    acknowledgement: { actor: "technician", acknowledgedAt: "2026-09-07T20:01:00.000Z", humanConfirmed: true },
+    evidence: { metric: "motorCurrent", value: 6.4, threshold: 5.6, baselineMean: 2.6, zScore: 8, observedAt: "2026-09-07T20:00:00.000Z" },
+    ...overrides
+  };
+}
+
+test("maintenance suggestions require acknowledged evidence and expose a deterministic rule basis", () => {
+  const workflow = new MaintenanceWorkflow();
+  assert.equal(workflow.suggest(acknowledgedAlert({ status: "open", acknowledgement: null })), null);
+
+  const suggestion = workflow.suggest(acknowledgedAlert());
+  assert.equal(suggestion.inspectWithinHours, 120);
+  assert.equal(suggestion.dueAt, "2026-09-12T20:00:00.000Z");
+  assert.equal(suggestion.ruleVersion, "maintenance-window-v1");
+  assert.equal(suggestion.status, "awaiting-human-confirmation");
+  assert.equal(suggestion.physicalAction, false);
+  assert.equal("confidence" in suggestion, false);
+});
+
+test("maintenance tickets require human confirmation, remain tenant scoped and prevent duplicates", () => {
+  const workflow = new MaintenanceWorkflow();
+  const alert = acknowledgedAlert();
+  assert.throws(() => workflow.confirm(alert, { actor: "technician", confirmed: false }), /confirmation/);
+
+  const first = workflow.confirm(alert, { actor: "demo-technician", confirmed: true, confirmedAt: "2026-09-07T20:02:00.000Z" });
+  const repeated = workflow.confirm(alert, { actor: "demo-technician", confirmed: true, confirmedAt: "2026-09-07T20:03:00.000Z" });
+  assert.equal(first.created, true);
+  assert.equal(first.ticket.status, "open");
+  assert.equal(first.ticket.physicalAction, false);
+  assert.equal(repeated.created, false);
+  assert.equal(repeated.duplicatePrevented, true);
+  assert.equal(repeated.ticket.id, first.ticket.id);
+  assert.equal(workflow.listTickets({ clientId: "client-1" }).length, 1);
+  assert.equal(workflow.listTickets({ clientId: "another-client" }).length, 0);
 });
