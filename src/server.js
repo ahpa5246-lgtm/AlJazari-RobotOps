@@ -21,12 +21,32 @@ const server = createServer(async (request, response) => {
         status: url.searchParams.get("status") || undefined
       }));
     }
+    if (request.method === "GET" && url.pathname === "/api/alerts") {
+      return json(response, 200, {
+        simulated: true,
+        alerts: service.alerts({
+          organizationId: "org-aljazari-demo",
+          clientId: url.searchParams.get("clientId") || undefined
+        })
+      });
+    }
     if (request.method === "GET" && url.pathname.startsWith("/api/robots/")) {
       const robot = service.robot(decodeURIComponent(url.pathname.split("/").at(-1)), {
         organizationId: "org-aljazari-demo",
         clientId: url.searchParams.get("clientId") || undefined
       });
       return json(response, robot ? 200 : 404, robot ?? { error: "Robot not found in tenant" });
+    }
+    if (request.method === "POST" && /^\/api\/alerts\/[^/]+\/acknowledge$/.test(url.pathname)) {
+      const body = await readBody(request);
+      const alertId = decodeURIComponent(url.pathname.split("/").at(-2));
+      return json(response, 200, {
+        simulated: true,
+        alert: service.acknowledgeAlert(alertId, body, {
+          organizationId: "org-aljazari-demo",
+          clientId: url.searchParams.get("clientId") || undefined
+        })
+      });
     }
     if (request.method === "POST" && url.pathname === "/api/simulator/faults") {
       const body = await readBody(request);
