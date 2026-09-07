@@ -1,0 +1,110 @@
+const CLIENTS = [
+  { id: "client-sindbad", name: "Sindbad Restaurant Group", site: { id: "site-karrada", name: "Karrada Flagship" } },
+  { id: "client-rashid", name: "Al-Rashid Hotel", site: { id: "site-lobby", name: "Main Lobby" } },
+  { id: "client-tech", name: "Baghdad Tech Campus", site: { id: "site-lab", name: "Robotics Lab" } }
+];
+
+const MODELS = [
+  { manufacturer: "Pudu", model: "BellaBot", capabilities: { battery: true, pose: true, missions: true, motors: false, sensors: true, network: true } },
+  { manufacturer: "Generic ROS 2", model: "Courier-X", capabilities: { battery: true, pose: true, missions: true, motors: true, sensors: true, network: true } },
+  { manufacturer: "Closed Vendor", model: "Service-Mini", capabilities: { battery: true, pose: false, missions: false, motors: false, sensors: false, network: true } }
+];
+
+export class SimulatorAdapter {
+  constructor({ seed = 20260907, count = 20, startTime = "2026-09-07T20:00:00.000Z" } = {}) {
+    this.seed = seed;
+    this.random = mulberry32(seed);
+    this.tickNumber = 0;
+    this.startTime = new Date(startTime).getTime();
+    this.robots = Array.from({ length: count }, (_, index) => this.#createRobot(index));
+    this.history = new Map(this.robots.map((robot) => [robot.id, []]));
+    this.faults = new Map();
+    for (let index = 0; index < 6; index += 1) this.tick();
+  }
+
+  describe() {
+    return { adapterId: "deterministic-simulator", transport: "in-process", simulated: true, supportsControl: false };
+  }
+
+  listRobots() { return this.robots.map((robot) => structuredClone(robot)); }
+  capabilities(robotId) { return structuredClone(this.#robot(robotId).capabilities); }
+  telemetry(robotId) { return structuredClone(this.history.get(robotId) ?? []); }
+
+  injectFault(robotId, fault) {
+    const supported = ["motor-overheat", "wheel-friction", "network-instability", "localization-loss"];
+    if (!supported.includes(fault)) throw new Error("Unsupported simulator fault");
+    this.#robot(robotId);
+    this.faults.set(robotId, fault);
+    this.tick();
+    return { robotId, fault, simulated: true, humanConfirmed: true };
+  }
+
+  tick() {
+    this.tickNumber += 1;
+    const observedAt = new Date(this.startTime + this.tickNumber * 30_000).toISOString();
+    for (const [index, robot] of this.robots.entries()) {
+      const fault = this.faults.get(robot.id);
+      const phase = this.tickNumber * 0.37 + index;
+      const sample = {
+        observedAt,
+        batteryPercentage: round(Math.max(8, 96 - this.tickNumber * (0.18 + index % 4 * 0.02) - index * 1.7)),
+        batteryTemperature: round(34 + Math.sin(phase) * 1.8),
+        motorCurrent: robot.capabilities.motors ? round(2.5 + Math.sin(phase) * 0.35) : null,
+        motorTemperature: robot.capabilities.motors ? round(43 + Math.cos(phase) * 2.2) : null,
+        localizationQuality: robot.capabilities.sensors ? round(91 + Math.sin(phase / 2) * 4) : null,
+        networkLatency: round(48 + (index % 5) * 9 + Math.abs(Math.sin(phase)) * 18),
+        signalStrength: round(91 - (index % 6) * 4),
+        position: robot.capabilities.pose ? { x: round(12 + Math.cos(phase) * (3 + index % 4)), y: round(8 + Math.sin(phase) * (2 + index % 3)), orientation: round(phase % (Math.PI * 2)) } : null,
+        mission: robot.capabilities.missions ? { id: `MS-${1000 + index}`, state: index % 5 === 0 ? "idle" : "working", progress: (this.tickNumber * 7 + index * 11) % 100 } : null
+      };
+      if (fault === "motor-overheat" && robot.capabilities.motors) sample.motorTemperature = 69 + this.tickNumber % 3;
+      if (fault === "wheel-friction" && robot.capabilities.motors) sample.motorCurrent = 6.4 + this.tickNumber % 2 * 0.2;
+      if (fault === "network-instability") sample.networkLatency = 520 + this.tickNumber % 4 * 20;
+      if (fault === "localization-loss" && robot.capabilities.sensors) sample.localizationQuality = 42 - this.tickNumber % 3;
+      const robotHistory = this.history.get(robot.id);
+      robotHistory.push(sample);
+      if (robotHistory.length > 120) robotHistory.shift();
+      robot.lastSeen = observedAt;
+      robot.connectionStatus = sample.networkLatency > 500 ? "warning" : "online";
+    }
+    return observedAt;
+  }
+
+  #createRobot(index) {
+    const model = MODELS[index % MODELS.length];
+    const client = CLIENTS[index % CLIENTS.length];
+    return {
+      id: `AJR-${String(index + 1).padStart(3, "0")}`,
+      organizationId: "org-aljazari-demo",
+      clientId: client.id,
+      clientName: client.name,
+      siteId: client.site.id,
+      siteName: client.site.name,
+      manufacturer: model.manufacturer,
+      model: model.model,
+      serialNumber: `SIM-${this.seed}-${String(index + 1).padStart(3, "0")}`,
+      firmwareVersion: `demo-${1 + index % 3}.${index % 10}`,
+      connectionStatus: "online",
+      lastSeen: null,
+      capabilities: structuredClone(model.capabilities),
+      simulated: true
+    };
+  }
+
+  #robot(robotId) {
+    const robot = this.robots.find((item) => item.id === robotId);
+    if (!robot) throw new Error("Robot not found");
+    return robot;
+  }
+}
+
+function mulberry32(seed) {
+  return function random() {
+    let value = seed += 0x6D2B79F5;
+    value = Math.imul(value ^ value >>> 15, value | 1);
+    value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+    return ((value ^ value >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function round(value) { return Math.round(value * 100) / 100; }
