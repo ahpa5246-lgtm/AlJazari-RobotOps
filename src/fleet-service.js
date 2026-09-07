@@ -1,9 +1,13 @@
 import { calculateHealth, detectAnomalies } from "./analytics.js";
 import { SimulatorAdapter } from "./simulator.js";
 import { assertRobotAdapter } from "./robot-adapter.js";
+import { AlertEngine } from "./alert-engine.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter()) { this.adapter = assertRobotAdapter(adapter); }
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine()) {
+    this.adapter = assertRobotAdapter(adapter);
+    this.alertEngine = alertEngine;
+  }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
     this.adapter.tick();
@@ -20,6 +24,7 @@ export class FleetService {
       simulated: true,
       source: this.adapter.describe(),
       totals: deriveTotals(robots),
+      alerts: this.alertEngine.list().filter((alert) => robots.some((robot) => robot.id === alert.robotId)),
       robots
     };
   }
@@ -30,7 +35,11 @@ export class FleetService {
     if (tenant.organizationId && robot.organizationId !== tenant.organizationId) return null;
     if (tenant.clientId && robot.clientId !== tenant.clientId) return null;
     const decorated = this.#decorate(robot);
-    return { ...decorated, history: this.adapter.telemetry(robotId).slice(-30) };
+    return {
+      ...decorated,
+      history: this.adapter.telemetry(robotId).slice(-30),
+      alerts: this.alertEngine.list({ robotId })
+    };
   }
 
   injectFault(robotId, fault) {
@@ -38,11 +47,22 @@ export class FleetService {
     return { confirmation, robot: this.robot(robotId, { organizationId: "org-aljazari-demo" }) };
   }
 
+  alerts(tenant = {}) {
+    return this.alertEngine.list(tenant);
+  }
+
+  acknowledgeAlert(alertId, acknowledgement, tenant = {}) {
+    const visible = this.alertEngine.list(tenant).some((alert) => alert.id === alertId);
+    if (!visible) throw new Error("Alert not found in tenant");
+    return this.alertEngine.acknowledge(alertId, acknowledgement);
+  }
+
   #decorate(robot) {
     const history = this.adapter.telemetry(robot.id);
     const telemetry = history.at(-1);
     const anomalies = detectAnomalies(history);
     const health = calculateHealth(telemetry, robot.capabilities);
+    this.alertEngine.ingest(robot, anomalies);
     const operationalState = anomalies.some((item) => item.severity === "critical") ? "critical"
       : anomalies.length ? "warning"
         : telemetry.mission?.state === "working" ? "working" : "idle";
