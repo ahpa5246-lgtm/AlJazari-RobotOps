@@ -29,7 +29,7 @@ The POST endpoint mutates the simulator only and cannot issue physical commands.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, six deterministic domain tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, seven deterministic domain tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
