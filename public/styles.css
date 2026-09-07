@@ -124,3 +124,10 @@ dialog::backdrop { background: #020705d9; backdrop-filter: blur(5px); }
 .ack-alert:disabled { opacity: .55; cursor: wait; }
 .acknowledged { display: inline-block; border-inline-start: 3px solid var(--signal); padding: .42rem .65rem; color: var(--signal); font: 700 .68rem var(--mono); }
 .evidence[data-status="acknowledged"] { opacity: .78; }
+
+.ticket-action { display: grid; gap: .6rem; justify-items: start; }
+.maintenance-window { color: var(--muted); font: .66rem/1.4 var(--mono); }
+.create-ticket { min-height: 44px; border: 1px solid var(--cyan); background: var(--cyan); color: var(--canvas); padding: .55rem .8rem; cursor: pointer; font: 800 .68rem var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+.create-ticket:hover { background: transparent; color: var(--cyan); }
+.create-ticket:disabled { opacity: .55; cursor: wait; }
+.ticket-open { display: inline-block; border-inline-start: 3px solid var(--cyan); padding: .42rem .65rem; color: var(--cyan); font: 700 .68rem/1.35 var(--mono); overflow-wrap: anywhere; }
