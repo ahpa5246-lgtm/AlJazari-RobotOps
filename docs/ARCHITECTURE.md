@@ -17,3 +17,8 @@ Samples contain ISO timestamps and are stored behind an adapter history method s
 Health `health-v1` is the supported-component weighted mean: battery 30%, motors 30%, sensors 20%, connectivity 20%. Missing capabilities are removed and remaining weights renormalized. This heuristic is explainable but not clinically, commercially or statistically validated.
 
 Anomaly rules currently expose measured value, explicit threshold, baseline mean and z-score. They produce human inspection recommendations only. No claim of predictive accuracy is made.
+
+
+## Alert lifecycle
+
+`AlertEngine` fingerprints anomaly evidence by robot and rule. A first observation opens one alert; later observations update its evidence and occurrence count instead of creating new records. The five-minute prototype cooldown counts repeated observations as suppressed and permits a new notification only after the cooldown. Acknowledgement requires an explicit human actor and confirmation, remains tenant-scoped, and never closes the underlying diagnostic evidence or triggers maintenance/physical control. Persistence, authentication, escalation and resolution policy remain later gates.
