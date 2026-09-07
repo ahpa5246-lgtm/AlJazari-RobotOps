@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
-import { extname, join, normalize } from "node:path";
+import { extname, join, normalize, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FleetService } from "./fleet-service.js";
 
@@ -43,7 +43,8 @@ const server = createServer(async (request, response) => {
 async function staticFile(pathname, response) {
   const safePath = normalize(pathname === "/" ? "index.html" : pathname.replace(/^\/+/, ""));
   const filePath = join(root, safePath);
-  if (!filePath.startsWith(root)) return json(response, 403, { error: "Forbidden" });
+  const relativePath = relative(root, filePath);
+  if (relativePath.startsWith("..") || relativePath.includes("/../") || relativePath.includes("\\..\\")) return json(response, 403, { error: "Forbidden" });
   try {
     const details = await stat(filePath);
     if (!details.isFile()) throw new Error("Not a file");

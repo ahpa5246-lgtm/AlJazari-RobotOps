@@ -2,7 +2,7 @@
 
 ## Runtime boundary
 
-`SimulatorAdapter` implements the first Universal Robot Interface: adapter metadata, robot identity, optional capability discovery, timestamped telemetry history and controlled simulator-only fault injection. `FleetService` is the vendor-neutral application layer. HTTP endpoints and the interface depend on this service rather than simulator internals.
+`assertRobotAdapter` is the executable Universal Robot Interface boundary. It requires adapter metadata, identity enumeration, optional capability discovery, timestamped telemetry history and ticking while deliberately permitting unsupported signals to remain absent. `SimulatorAdapter` is the first conforming adapter. `FleetService` is the vendor-neutral application layer; HTTP endpoints and the interface depend on this service rather than simulator internals.
 
 Future REST, MQTT, WebSocket and ROS 2 adapters must implement the same boundary without changing fleet-domain consumers. Physical control is deliberately absent; `supportsControl` is always false in this prototype.
 

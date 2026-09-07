@@ -3,6 +3,12 @@ import assert from "node:assert/strict";
 import { SimulatorAdapter } from "../src/simulator.js";
 import { FleetService } from "../src/fleet-service.js";
 import { calculateHealth } from "../src/analytics.js";
+import { assertRobotAdapter } from "../src/robot-adapter.js";
+
+test("adapter contract rejects incomplete vendor integrations", () => {
+  assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
+  assert.doesNotThrow(() => assertRobotAdapter(new SimulatorAdapter()));
+});
 
 test("fixed seed produces reproducible identities and telemetry", () => {
   const first = new SimulatorAdapter({ seed: 42 });

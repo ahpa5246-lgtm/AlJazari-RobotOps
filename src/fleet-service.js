@@ -1,8 +1,9 @@
 import { calculateHealth, detectAnomalies } from "./analytics.js";
 import { SimulatorAdapter } from "./simulator.js";
+import { assertRobotAdapter } from "./robot-adapter.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter()) { this.adapter = adapter; }
+  constructor(adapter = new SimulatorAdapter()) { this.adapter = assertRobotAdapter(adapter); }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
     this.adapter.tick();
