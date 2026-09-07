@@ -131,3 +131,25 @@ dialog::backdrop { background: #020705d9; backdrop-filter: blur(5px); }
 .create-ticket:hover { background: transparent; color: var(--cyan); }
 .create-ticket:disabled { opacity: .55; cursor: wait; }
 .ticket-open { display: inline-block; border-inline-start: 3px solid var(--cyan); padding: .42rem .65rem; color: var(--cyan); font: 700 .68rem/1.35 var(--mono); overflow-wrap: anywhere; }
+
+
+.incident-action { display: grid; gap: .65rem; justify-items: start; }
+.replay-incident { min-height: 44px; padding: .55rem .8rem; border: 1px solid var(--signal); background: transparent; color: var(--signal); cursor: pointer; font: 800 .68rem var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+.replay-incident:hover { background: color-mix(in srgb, var(--signal) 12%, transparent); }
+.incident-detail h2 { max-width: 15ch; }
+.replay-summary { display: grid; gap: .35rem; margin: 1.4rem 0; padding: 1rem; border-inline-start: 3px solid var(--cyan); background: color-mix(in srgb, var(--surface-2) 76%, transparent); font: .74rem/1.45 var(--mono); }
+.replay-summary span { color: var(--muted); }
+.capability-notice { margin: 1rem 0; padding: .85rem 1rem; border: 1px solid var(--warning); color: var(--warning); font-size: .8rem; line-height: 1.55; }
+.incident-timeline { margin: 1.5rem 0; padding: 0; list-style: none; border-top: 1px solid var(--edge); }
+.incident-event { position: relative; display: grid; grid-template-columns: minmax(7rem, .7fr) minmax(9rem, 1fr) 2.2fr; gap: .8rem; padding: 1rem 0 1rem 1.25rem; border-bottom: 1px solid var(--edge); }
+[dir="rtl"] .incident-event { padding: 1rem 1.25rem 1rem 0; }
+.incident-event::before { content: ""; position: absolute; inset-inline-start: 0; top: 1.35rem; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); }
+.incident-event time, .incident-event strong { font: .7rem/1.45 var(--mono); }
+.incident-event time { color: var(--muted); }
+.incident-signal-grid { display: flex; flex-wrap: wrap; gap: .35rem .75rem; color: var(--muted); font: .66rem/1.45 var(--mono); }
+.incident-signal-grid b { color: var(--ink); font-weight: 600; }
+.replay-safety { padding-top: 1rem; border-top: 1px solid var(--edge); color: var(--muted); font-size: .78rem; line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .incident-event { grid-template-columns: 1fr; gap: .35rem; }
+}
