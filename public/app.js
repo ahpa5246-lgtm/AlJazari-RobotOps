@@ -1,6 +1,6 @@
 const copy = {
-  en: { product: "ROBOT OPERATIONS INTELLIGENCE", liveOperations: "LIVE OPERATIONS / BAGHDAD", title: "Fleet command, without vendor blind spots.", lede: "Twenty virtual robots report through one capability-aware interface. Unsupported signals stay visibly unsupported.", topologyEyebrow: "FLEET TOPOLOGY", topology: "Operational field", evidenceEyebrow: "EXPLAINABLE EVIDENCE", evidence: "Why the system is concerned", registryEyebrow: "UNIVERSAL ROBOT REGISTRY", registry: "Fleet identities", search: "Search", state: "State", all: "All states", noEvidence: "No active anomaly evidence. Values remain simulated and this prototype makes no prediction accuracy claim.", updated: "Telemetry received", health: "health", inject: "Inject confirmed demo fault", noResults: "No robots match these filters.", unsupported: "Unsupported", total: "Total", online: "Online", working: "Working", idle: "Idle", warning: "Warning", critical: "Critical", acknowledge: "Acknowledge", acknowledged: "Acknowledged", occurrences: "occurrences", suppressed: "duplicates suppressed", recommendInspection: "Human inspection is recommended. No automatic physical action is permitted." },
-  ar: { product: "ذكاء عمليات الروبوتات", liveOperations: "عمليات مباشرة / بغداد", title: "قيادة أسطول بلا نقاط عمياء بين الشركات.", lede: "عشرون روبوتًا افتراضيًا ترسل بياناتها عبر واجهة موحّدة تراعي القدرات. ما لا يدعمه الروبوت يبقى ظاهرًا بوضوح على أنه غير مدعوم.", topologyEyebrow: "طوبولوجيا الأسطول", topology: "المجال التشغيلي", evidenceEyebrow: "أدلة قابلة للتفسير", evidence: "لماذا يشعر النظام بالقلق؟", registryEyebrow: "السجل الموحّد للروبوتات", registry: "هويات الأسطول", search: "بحث", state: "الحالة", all: "كل الحالات", noEvidence: "لا توجد أدلة شذوذ نشطة. البيانات محاكاة ولا يدّعي هذا النموذج دقة تنبؤية.", updated: "وصلت التليمترية", health: "الصحة", inject: "حقن عطل تجريبي مؤكد", noResults: "لا توجد روبوتات تطابق المرشحات.", unsupported: "غير مدعوم", total: "الإجمالي", online: "متصل", working: "يعمل", idle: "خامل", warning: "تحذير", critical: "حرج", acknowledge: "إقرار بشري", acknowledged: "تم الإقرار", occurrences: "مرات الرصد", suppressed: "تنبيهات مكررة حُجبت", recommendInspection: "يُنصح بفحص بشري. لا يُسمح بأي إجراء مادي تلقائي." }
+  en: { product: "ROBOT OPERATIONS INTELLIGENCE", liveOperations: "LIVE OPERATIONS / BAGHDAD", title: "Fleet command, without vendor blind spots.", lede: "Twenty virtual robots report through one capability-aware interface. Unsupported signals stay visibly unsupported.", topologyEyebrow: "FLEET TOPOLOGY", topology: "Operational field", evidenceEyebrow: "EXPLAINABLE EVIDENCE", evidence: "Why the system is concerned", registryEyebrow: "UNIVERSAL ROBOT REGISTRY", registry: "Fleet identities", search: "Search", state: "State", all: "All states", noEvidence: "No active anomaly evidence. Values remain simulated and this prototype makes no prediction accuracy claim.", updated: "Telemetry received", health: "health", inject: "Inject confirmed demo fault", noResults: "No robots match these filters.", unsupported: "Unsupported", total: "Total", online: "Online", working: "Working", idle: "Idle", warning: "Warning", critical: "Critical", acknowledge: "Acknowledge", acknowledged: "Acknowledged", occurrences: "occurrences", suppressed: "duplicates suppressed", recommendInspection: "Human inspection is recommended. No automatic physical action is permitted.", confirmTicket: "Confirm maintenance ticket", ticketOpen: "Maintenance ticket open", inspectWithin: "rule-based inspection window", hours: "hours" },
+  ar: { product: "ذكاء عمليات الروبوتات", liveOperations: "عمليات مباشرة / بغداد", title: "قيادة أسطول بلا نقاط عمياء بين الشركات.", lede: "عشرون روبوتًا افتراضيًا ترسل بياناتها عبر واجهة موحّدة تراعي القدرات. ما لا يدعمه الروبوت يبقى ظاهرًا بوضوح على أنه غير مدعوم.", topologyEyebrow: "طوبولوجيا الأسطول", topology: "المجال التشغيلي", evidenceEyebrow: "أدلة قابلة للتفسير", evidence: "لماذا يشعر النظام بالقلق؟", registryEyebrow: "السجل الموحّد للروبوتات", registry: "هويات الأسطول", search: "بحث", state: "الحالة", all: "كل الحالات", noEvidence: "لا توجد أدلة شذوذ نشطة. البيانات محاكاة ولا يدّعي هذا النموذج دقة تنبؤية.", updated: "وصلت التليمترية", health: "الصحة", inject: "حقن عطل تجريبي مؤكد", noResults: "لا توجد روبوتات تطابق المرشحات.", unsupported: "غير مدعوم", total: "الإجمالي", online: "متصل", working: "يعمل", idle: "خامل", warning: "تحذير", critical: "حرج", acknowledge: "إقرار بشري", acknowledged: "تم الإقرار", occurrences: "مرات الرصد", suppressed: "تنبيهات مكررة حُجبت", recommendInspection: "يُنصح بفحص بشري. لا يُسمح بأي إجراء مادي تلقائي.", confirmTicket: "تأكيد تذكرة الصيانة", ticketOpen: "تذكرة الصيانة مفتوحة", inspectWithin: "مهلة الفحص حسب القاعدة", hours: "ساعة" }
 };
 
 let language = localStorage.getItem("robotops-language") || "en";
@@ -30,6 +30,7 @@ function render() {
   const alerts = snapshot.alerts ?? [];
   document.querySelector("#evidence-list").innerHTML = alerts.length ? alerts.slice(0, 8).map(alertCard).join("") : `<p class="empty">${t("noEvidence")}</p>`;
   document.querySelectorAll(".ack-alert").forEach((button) => button.addEventListener("click", () => acknowledgeAlert(button.dataset.alertId, button)));
+  document.querySelectorAll(".create-ticket").forEach((button) => button.addEventListener("click", () => createMaintenanceTicket(button.dataset.alertId, button)));
   drawTopology();
 }
 
@@ -50,9 +51,16 @@ function robotCard(robot) {
 
 function alertCard(alert) {
   const anomaly = alert.evidence;
-  const action = alert.status === "open"
-    ? `<button class="ack-alert" type="button" data-alert-id="${alert.id}">${t("acknowledge")}</button>`
-    : `<span class="acknowledged">${t("acknowledged")} · ${alert.acknowledgement.actor}</span>`;
+  const suggestion = snapshot.maintenance?.suggestions.find((item) => item.sourceAlertId === alert.id);
+  const ticket = snapshot.maintenance?.tickets.find((item) => item.sourceAlertId === alert.id);
+  let action = `<button class="ack-alert" type="button" data-alert-id="${alert.id}">${t("acknowledge")}</button>`;
+  if (ticket) {
+    action = `<span class="ticket-open">${t("ticketOpen")} · ${ticket.id}</span>`;
+  } else if (suggestion) {
+    action = `<div class="ticket-action"><span class="acknowledged">${t("acknowledged")} · ${alert.acknowledgement.actor}</span><span class="maintenance-window">${t("inspectWithin")}: ${suggestion.inspectWithinHours} ${t("hours")}</span><button class="create-ticket" type="button" data-alert-id="${alert.id}">${t("confirmTicket")}</button></div>`;
+  } else if (alert.status === "acknowledged") {
+    action = `<span class="acknowledged">${t("acknowledged")} · ${alert.acknowledgement.actor}</span>`;
+  }
   return `<article class="evidence" data-severity="${alert.severity}" data-status="${alert.status}">
     <strong>${alert.robotId} · ${alert.code}</strong><p>${t("recommendInspection")}</p>
     <dl><div><dt>metric</dt><dd>${anomaly.metric}</dd></div><div><dt>value / threshold</dt><dd>${anomaly.value} / ${anomaly.threshold}</dd></div><div><dt>baseline mean</dt><dd>${anomaly.baselineMean}</dd></div><div><dt>z-score</dt><dd>${anomaly.zScore}</dd></div></dl>
@@ -71,6 +79,20 @@ async function acknowledgeAlert(alertId, button) {
   if (!response.ok) {
     button.disabled = false;
     throw new Error("Alert acknowledgement failed");
+  }
+  await load();
+}
+
+async function createMaintenanceTicket(alertId, button) {
+  button.disabled = true;
+  const response = await fetch("/api/maintenance/tickets", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ alertId, actor: "demo-technician", confirmed: true })
+  });
+  if (!response.ok) {
+    button.disabled = false;
+    throw new Error("Maintenance ticket confirmation failed");
   }
   await load();
 }

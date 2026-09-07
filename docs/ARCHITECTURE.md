@@ -22,3 +22,8 @@ Anomaly rules currently expose measured value, explicit threshold, baseline mean
 ## Alert lifecycle
 
 `AlertEngine` fingerprints anomaly evidence by robot and rule. A first observation opens one alert; later observations update its evidence and occurrence count instead of creating new records. The five-minute prototype cooldown counts repeated observations as suppressed and permits a new notification only after the cooldown. Acknowledgement requires an explicit human actor and confirmation, remains tenant-scoped, and never closes the underlying diagnostic evidence or triggers maintenance/physical control. Persistence, authentication, escalation and resolution policy remain later gates.
+
+
+## Maintenance suggestion lifecycle
+
+`MaintenanceWorkflow` accepts only alerts already acknowledged by a named human. `maintenance-window-v1` maps severity to an explicit inspection window: critical 24 hours, high 120 hours, warning 336 hours and info 720 hours. The output deliberately contains no probability or confidence score. Creating a ticket is a second separately confirmed human action, is idempotent per source alert, preserves the exact anomaly evidence and remains tenant-scoped. Tickets are simulated in-memory work records and cannot issue repair or robot commands.

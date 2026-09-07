@@ -30,6 +30,12 @@ const server = createServer(async (request, response) => {
         })
       });
     }
+    if (request.method === "GET" && url.pathname === "/api/maintenance") {
+      return json(response, 200, service.maintenance({
+        organizationId: "org-aljazari-demo",
+        clientId: url.searchParams.get("clientId") || undefined
+      }));
+    }
     if (request.method === "GET" && url.pathname.startsWith("/api/robots/")) {
       const robot = service.robot(decodeURIComponent(url.pathname.split("/").at(-1)), {
         organizationId: "org-aljazari-demo",
@@ -43,6 +49,16 @@ const server = createServer(async (request, response) => {
       return json(response, 200, {
         simulated: true,
         alert: service.acknowledgeAlert(alertId, body, {
+          organizationId: "org-aljazari-demo",
+          clientId: url.searchParams.get("clientId") || undefined
+        })
+      });
+    }
+    if (request.method === "POST" && url.pathname === "/api/maintenance/tickets") {
+      const body = await readBody(request);
+      return json(response, 200, {
+        simulated: true,
+        ...service.confirmMaintenanceTicket(body.alertId, body, {
           organizationId: "org-aljazari-demo",
           clientId: url.searchParams.get("clientId") || undefined
         })
