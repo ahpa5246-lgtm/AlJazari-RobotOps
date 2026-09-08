@@ -26,6 +26,7 @@ Open `http://localhost:3000`.
 - `GET /api/robots/:id?clientId=`
 - `GET /api/robots/:id/diagnostics?clientId=&question=`
 - `GET /api/robots/:id/missions?clientId=`
+- `GET /api/robots/:id/telemetry?clientId=&startAt=&endAt=&limit=&cursor=`
 - `GET /api/alerts?clientId=`
 - `POST /api/alerts/:id/acknowledge` with `{ "actor": "demo-technician", "confirmed": true }`
 - `GET /api/incidents?clientId=`
@@ -42,11 +43,13 @@ Mission timelines are reconstructed from adapter-reported mission transitions. S
 
 Fleet mission analytics aggregate those records with formula version `mission-analytics-v1`. Every rate exposes its exact numerator, denominator and eligibility rule. Completion, failure and cancellation use observed terminal outcomes only; utilization uses reported mission-state samples from mission-capable robots. Duration and distance disclose contributing and excluded records. Empty denominators return `null`, never a decorative zero. No confidence or predictive claim is produced.
 
+Bounded telemetry history is read through an explicit repository contract rather than simulator-owned arrays. The endpoint exposes stable ascending timestamp order, inclusive time bounds, an exclusive continuation cursor, a maximum 120-sample page, tenant scope and retention/source metadata. The current repository is deterministic, in-memory and non-durable; it is not production storage.
+
 All POST endpoints mutate in-memory demo state only and cannot issue physical commands. Alert acknowledgement and maintenance-ticket creation each require an explicit human actor and confirmation. A ticket can be created only from acknowledged evidence.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, thirty deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, thirty-three deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
@@ -56,6 +59,7 @@ All POST endpoints mutate in-memory demo state only and cannot issue physical co
 - The diagnostic assistant is deterministic decision support, not an LLM diagnosis. It does not interpret free text, prove causality or display an unvalidated confidence percentage.
 - Mission history exists only inside the bounded in-memory telemetry window. Partial lifecycles remain visibly incomplete and are not backfilled.
 - Fleet mission analytics describe only the current bounded in-memory window; they are not historical SLAs, forecasts or validated business-performance claims.
+- The telemetry repository retains at most 120 samples per robot, is erased on restart and provides no production database, encryption-at-rest or backup guarantee.
 - Inspection windows are documented severity rules, not predicted failure probabilities. Tickets never trigger repair or physical control.
 - Health and anomaly rules are transparent prototype heuristics, not validated failure prediction.
 - Canvas topology is a progressive visualization; the semantic fleet registry remains available without it.

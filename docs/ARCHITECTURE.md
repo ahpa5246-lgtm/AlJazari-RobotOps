@@ -53,3 +53,9 @@ The deterministic simulator emits explicit mission cycles and fictional outcomes
 `MissionAnalytics` aggregates tenant-filtered robot histories and `MissionTimeline` records. `mission-analytics-v1` calculates completion, failure and cancellation rates over observed terminal outcomes only; utilization uses telemetry samples from mission-capable robots that report a mission state. Every rate returns its numerator, denominator and eligibility rule. Duration and distance return contributing and excluded record counts, while zero-evidence denominators produce `null`.
 
 The response carries the exact observation window, capability coverage, `confidence: null`, `predictive: false`, `readOnly: true` and `physicalControl: false`. It is a bounded operational summary, not a persisted SLA or prediction.
+
+## Time-series repository boundary
+
+`InMemoryTelemetryRepository` is the first executable storage-port implementation used by the simulator and `FleetService`. The simulator appends timestamped observations; application services read through the repository instead of simulator-owned arrays. Each robot is registered with organization/client identity, and repository queries enforce that scope before returning samples.
+
+The contract requires strictly increasing timestamps, stable ascending results, inclusive start/end bounds, a bounded page limit and an exclusive timestamp cursor. Responses declare retained/dropped counts, oldest/newest retained timestamps and a non-durable in-memory source. The prototype retains at most 120 samples per robot. This is not a production time-series database, restart-safe persistence, encryption, authentication or a migration; a future PostgreSQL/time-series adapter must preserve this isolation and query contract.

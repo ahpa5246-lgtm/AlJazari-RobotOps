@@ -7,9 +7,10 @@ import { IncidentReplay } from "./incident-replay.js";
 import { DiagnosticCopilot } from "./diagnostic-copilot.js";
 import { MissionTimeline } from "./mission-timeline.js";
 import { MissionAnalytics } from "./mission-analytics.js";
+import { assertTelemetryRepository } from "./telemetry-repository.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot(), missionTimeline = new MissionTimeline(), missionAnalytics = new MissionAnalytics()) {
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot(), missionTimeline = new MissionTimeline(), missionAnalytics = new MissionAnalytics(), telemetryRepository = adapter.telemetryRepository) {
     this.adapter = assertRobotAdapter(adapter);
     this.alertEngine = alertEngine;
     this.maintenanceWorkflow = maintenanceWorkflow;
@@ -17,6 +18,7 @@ export class FleetService {
     this.diagnosticCopilot = diagnosticCopilot;
     this.missionTimelineBuilder = missionTimeline;
     this.missionAnalyticsBuilder = missionAnalytics;
+    this.telemetryRepository = assertTelemetryRepository(telemetryRepository);
   }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
@@ -31,7 +33,7 @@ export class FleetService {
 
     const alerts = this.alertEngine.list().filter((alert) => robots.some((robot) => robot.id === alert.robotId));
     const robotIds = new Set(robots.map((robot) => robot.id));
-    const histories = new Map(robots.map((robot) => [robot.id, this.adapter.telemetry(robot.id)]));
+    const histories = new Map(robots.map((robot) => [robot.id, this.#history(robot.id)]));
     const incidents = this.incidentReplay.list(robots, histories, alerts);
     return {
       generatedAt: robots[0]?.telemetry.observedAt ?? new Date().toISOString(),
@@ -56,7 +58,7 @@ export class FleetService {
     const decorated = this.#decorate(robot);
     return {
       ...decorated,
-      history: this.adapter.telemetry(robotId).slice(-30),
+      history: this.#history(robotId).slice(-30),
       alerts: this.alertEngine.list({ robotId }),
       maintenance: this.maintenance({ ...tenant, robotId }),
       incidents: this.incidents({ ...tenant, robotId }),
@@ -99,7 +101,7 @@ export class FleetService {
       .filter((robot) => !tenant.organizationId || robot.organizationId === tenant.organizationId)
       .filter((robot) => !tenant.clientId || robot.clientId === tenant.clientId)
       .filter((robot) => !tenant.robotId || robot.id === tenant.robotId);
-    const histories = new Map(robots.map((robot) => [robot.id, this.adapter.telemetry(robot.id)]));
+    const histories = new Map(robots.map((robot) => [robot.id, this.#history(robot.id)]));
     return this.incidentReplay.list(robots, histories, this.alertEngine.list(tenant));
   }
 
@@ -113,7 +115,7 @@ export class FleetService {
     if (tenant.organizationId && robot.organizationId !== tenant.organizationId) return null;
     if (tenant.clientId && robot.clientId !== tenant.clientId) return null;
     const decorated = this.#decorate(robot);
-    const history = this.adapter.telemetry(robotId);
+    const history = this.#history(robotId);
     return this.diagnosticCopilot.analyze({
       robot: decorated,
       history,
@@ -129,14 +131,14 @@ export class FleetService {
     if (!robot) return null;
     if (tenant.organizationId && robot.organizationId !== tenant.organizationId) return null;
     if (tenant.clientId && robot.clientId !== tenant.clientId) return null;
-    return this.missionTimelineBuilder.build(robot, this.adapter.telemetry(robotId));
+    return this.missionTimelineBuilder.build(robot, this.#history(robotId));
   }
 
   missionAnalytics(tenant = {}) {
     const robots = this.adapter.listRobots()
       .filter((robot) => !tenant.organizationId || robot.organizationId === tenant.organizationId)
       .filter((robot) => !tenant.clientId || robot.clientId === tenant.clientId);
-    const histories = new Map(robots.map((robot) => [robot.id, this.adapter.telemetry(robot.id)]));
+    const histories = new Map(robots.map((robot) => [robot.id, this.#history(robot.id)]));
     const timelines = robots.map((robot) => this.missionTimelineBuilder.build(robot, histories.get(robot.id)));
     return {
       ...this.missionAnalyticsBuilder.build({ robots, histories, timelines }),
@@ -147,8 +149,20 @@ export class FleetService {
     };
   }
 
+  telemetryHistory(robotId, tenant = {}, query = {}) {
+    return this.telemetryRepository.query({
+      robotId,
+      organizationId: tenant.organizationId,
+      clientId: tenant.clientId,
+      startAt: query.startAt,
+      endAt: query.endAt,
+      cursor: query.cursor,
+      limit: query.limit
+    });
+  }
+
   #decorate(robot) {
-    const history = this.adapter.telemetry(robot.id);
+    const history = this.#history(robot.id);
     const telemetry = history.at(-1);
     const anomalies = detectAnomalies(history);
     const health = calculateHealth(telemetry, robot.capabilities);
@@ -157,6 +171,13 @@ export class FleetService {
       : anomalies.length ? "warning"
         : telemetry.mission?.state === "working" ? "working" : "idle";
     return { ...robot, telemetry, health, anomalies, operationalState };
+  }
+
+  #history(robotId) {
+    return this.telemetryRepository.query({
+      robotId,
+      limit: this.telemetryRepository.describe().maxQueryLimit
+    })?.samples ?? [];
   }
 }
 

@@ -11,6 +11,7 @@ import { IncidentReplay } from "../src/incident-replay.js";
 import { DiagnosticCopilot } from "../src/diagnostic-copilot.js";
 import { MissionTimeline } from "../src/mission-timeline.js";
 import { MissionAnalytics } from "../src/mission-analytics.js";
+import { InMemoryTelemetryRepository, assertTelemetryRepository } from "../src/telemetry-repository.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -412,4 +413,86 @@ test("mission analytics UI renders API evidence rather than decorative constants
   assert.match(client, /missionAnalytics\.duration\.excludedRecords/);
   assert.match(client, /missionAnalytics\.formulaVersion/);
   assert.match(page, /id="mission-analytics"/);
+});
+
+test("telemetry repository enforces tenant scope, stable windows and bounded pagination", () => {
+  const repository = new InMemoryTelemetryRepository({ retentionSamplesPerRobot: 4, maxQueryLimit: 2 });
+  repository.registerRobot({ id: "R-1", organizationId: "org-1", clientId: "client-1" });
+  assert.throws(
+    () => repository.registerRobot({ id: "R-1", organizationId: "org-1", clientId: "client-2" }),
+    /tenant identity cannot change/
+  );
+  for (let index = 0; index < 5; index += 1) {
+    repository.append("R-1", {
+      observedAt: `2026-09-08T00:0${index}:00.000Z`,
+      batteryPercentage: 90 - index
+    });
+  }
+
+  assert.equal(repository.query({ robotId: "R-1", organizationId: "org-2", limit: 2 }), null);
+  const first = repository.query({
+    robotId: "R-1",
+    organizationId: "org-1",
+    clientId: "client-1",
+    startAt: "2026-09-08T00:01:00.000Z",
+    endAt: "2026-09-08T00:04:00.000Z",
+    limit: 2
+  });
+  assert.deepEqual(first.samples.map((sample) => sample.observedAt), [
+    "2026-09-08T00:01:00.000Z",
+    "2026-09-08T00:02:00.000Z"
+  ]);
+  assert.deepEqual(first.pageInfo, {
+    limit: 2,
+    returned: 2,
+    hasNextPage: true,
+    nextCursor: "2026-09-08T00:02:00.000Z",
+    order: "observedAt-ascending"
+  });
+  const second = repository.query({ robotId: "R-1", cursor: first.pageInfo.nextCursor, limit: 2 });
+  assert.deepEqual(second.samples.map((sample) => sample.observedAt), [
+    "2026-09-08T00:03:00.000Z",
+    "2026-09-08T00:04:00.000Z"
+  ]);
+  assert.equal(first.retention.droppedSamples, 1);
+  assert.equal(first.source.durable, false);
+  assert.equal(first.physicalControl, false);
+});
+
+test("telemetry repository rejects invalid limits, timestamps and ordering", () => {
+  const repository = new InMemoryTelemetryRepository({ retentionSamplesPerRobot: 3, maxQueryLimit: 2 });
+  assert.doesNotThrow(() => assertTelemetryRepository(repository));
+  assert.throws(
+    () => assertTelemetryRepository({ describe: () => ({ repositoryId: "broken", maxQueryLimit: 2 }) }),
+    /missing registerRobot/
+  );
+  repository.registerRobot({ id: "R-1", organizationId: "org-1", clientId: "client-1" });
+  repository.append("R-1", { observedAt: "2026-09-08T00:00:00.000Z" });
+  assert.throws(() => repository.query({ robotId: "R-1", limit: 3 }), /limit must be between/);
+  assert.throws(() => repository.query({ robotId: "R-1", startAt: "not-a-date" }), /ISO timestamp/);
+  assert.throws(() => repository.query({ robotId: "R-1", startAt: "2026-09-08" }), /explicit timezone/);
+  assert.throws(() => repository.query({ robotId: "R-1", startAt: "2026-09-08T00:00:00" }), /explicit timezone/);
+  assert.throws(() => repository.query({ robotId: "R-1", startAt: "2026-09-08T01:00:00Z", endAt: "2026-09-08T00:00:00Z" }), /must not follow/);
+  assert.throws(() => repository.append("R-1", { observedAt: "2026-09-08T00:00:00.000Z" }), /strictly increasing/);
+});
+
+test("fleet telemetry history uses the repository boundary and remains tenant scoped", () => {
+  const adapter = new SimulatorAdapter();
+  adapter.telemetry = () => { throw new Error("legacy adapter telemetry must not be read"); };
+  const service = new FleetService(adapter);
+  const hidden = service.telemetryHistory("AJR-002", {
+    organizationId: "org-aljazari-demo",
+    clientId: "client-sindbad"
+  }, { limit: 2 });
+  assert.equal(hidden, null);
+  const visible = service.telemetryHistory("AJR-002", {
+    organizationId: "org-aljazari-demo",
+    clientId: "client-rashid"
+  }, { limit: 2 });
+  assert.equal(visible.samples.length, 2);
+  assert.equal(visible.scope.clientId, "client-rashid");
+  assert.equal(visible.source.repositoryId, "deterministic-in-memory-telemetry");
+  assert.equal(visible.simulated, true);
+  assert.equal(visible.readOnly, true);
+  assert.equal(visible.physicalControl, false);
 });

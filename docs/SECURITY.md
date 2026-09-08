@@ -10,4 +10,6 @@
 - Diagnostic output is deterministic decision support. It does not call an LLM, interpret free text, claim confidence or causality, or expose a command route.
 - Mission timelines are tenant-scoped, read-only reconstructions from simulator telemetry. They cannot start, cancel, reroute or otherwise control a robot, and missing lifecycle evidence is never synthesized.
 - Fleet mission analytics use the same tenant-filtered histories, expose formula denominators/exclusions and return no confidence or prediction. The endpoint is read-only and has no physical-control path.
+- Telemetry history scope is checked inside repository queries as well as the service boundary; invalid ranges and over-limit requests fail closed.
+- The in-memory telemetry repository is explicitly non-durable and makes no encryption, backup or production-retention claim.
 - Public deployment, production database migration, secrets and real robot integration require separate owner and security approval.
