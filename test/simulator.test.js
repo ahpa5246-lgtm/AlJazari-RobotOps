@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { SimulatorAdapter } from "../src/simulator.js";
 import { FleetService } from "../src/fleet-service.js";
 import { calculateHealth } from "../src/analytics.js";
@@ -187,4 +188,13 @@ test("fleet incident queries enforce tenant scope", () => {
   const hidden = service.incidents({ organizationId: "org-aljazari-demo", clientId: "client-sindbad" });
   assert.equal(visible.some((incident) => incident.robotId === "AJR-002"), true);
   assert.equal(hidden.some((incident) => incident.robotId === "AJR-002"), false);
+});
+
+
+test("incident replay UI consumes the public replay contract fields", () => {
+  const client = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  assert.match(client, /replay\.windowStartAt/);
+  assert.match(client, /replay\.windowEndAt/);
+  assert.match(client, /replay\.sampleCount/);
+  assert.doesNotMatch(client, /replay\.window\./);
 });
