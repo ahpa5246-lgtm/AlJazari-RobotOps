@@ -8,6 +8,7 @@ import { assertRobotAdapter } from "../src/robot-adapter.js";
 import { AlertEngine } from "../src/alert-engine.js";
 import { MaintenanceWorkflow } from "../src/maintenance-workflow.js";
 import { IncidentReplay } from "../src/incident-replay.js";
+import { DiagnosticCopilot } from "../src/diagnostic-copilot.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -197,4 +198,62 @@ test("incident replay UI consumes the public replay contract fields", () => {
   assert.match(client, /replay\.windowEndAt/);
   assert.match(client, /replay\.sampleCount/);
   assert.doesNotMatch(client, /replay\.window\./);
+});
+
+
+function diagnosticHistory(latest = {}) {
+  return [
+    { observedAt: "2026-09-07T20:00:00.000Z", batteryPercentage: 82, batteryTemperature: 34, motorCurrent: 2.4, motorTemperature: 44, localizationQuality: 93, networkLatency: 48, signalStrength: 91 },
+    { observedAt: "2026-09-07T20:00:30.000Z", batteryPercentage: 81, batteryTemperature: 34, motorCurrent: 2.5, motorTemperature: 44, localizationQuality: 92, networkLatency: 52, signalStrength: 90 },
+    { observedAt: "2026-09-07T20:01:00.000Z", batteryPercentage: 80, batteryTemperature: 35, motorCurrent: 2.6, motorTemperature: 45, localizationQuality: 91, networkLatency: 55, signalStrength: 89 },
+    { observedAt: "2026-09-07T20:01:30.000Z", batteryPercentage: 79, batteryTemperature: 35, motorCurrent: 2.5, motorTemperature: 45, localizationQuality: 90, networkLatency: 58, signalStrength: 88, ...latest }
+  ];
+}
+
+test("diagnostic copilot is deterministic and grounds a working hypothesis in threshold evidence", () => {
+  const copilot = new DiagnosticCopilot();
+  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1" };
+  const input = { robot, history: diagnosticHistory({ networkLatency: 520 }), question: "Why did it pause?" };
+  const first = copilot.analyze(input);
+  const second = copilot.analyze(input);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.summaryCode, "POSSIBLE_CONNECTIVITY_DEGRADATION");
+  assert.equal(first.primaryHypothesis.sourceEvidenceCode, "NETWORK_LATENCY_HIGH");
+  assert.equal(first.observations[0].metric, "networkLatency");
+  assert.equal(first.observations[0].value, 520);
+  assert.equal(first.confidence, null);
+  assert.equal(first.causalConclusion, null);
+  assert.equal(first.physicalControl, false);
+});
+
+test("diagnostic copilot reports insufficient evidence instead of inventing a cause", () => {
+  const copilot = new DiagnosticCopilot();
+  const result = copilot.analyze({
+    robot: { id: "AJR-001", organizationId: "org-1", clientId: "client-1" },
+    history: diagnosticHistory()
+  });
+  assert.equal(result.status, "insufficient-evidence");
+  assert.equal(result.primaryHypothesis, null);
+  assert.equal(result.summaryCode, "INSUFFICIENT_EVIDENCE");
+  assert.equal(result.recommendedInspection[0].code, "COLLECT_MORE_EVIDENCE");
+  assert.equal(result.alternatives.every((item) => item.status === "not-ruled-out"), true);
+});
+
+test("fleet diagnostic queries enforce tenant scope and preserve control separation", () => {
+  const service = new FleetService(new SimulatorAdapter());
+  assert.equal(service.diagnostic("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-sindbad" }), null);
+  const visible = service.diagnostic("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-rashid" }, "Summarize evidence");
+  assert.equal(visible.clientId, "client-rashid");
+  assert.equal(visible.decisionSupportOnly, true);
+  assert.equal(visible.physicalControl, false);
+});
+
+test("diagnostic UI consumes evidence, alternatives and safety fields through the read-only endpoint", () => {
+  const client = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  assert.match(client, /\/api\/robots\/\$\{encodeURIComponent\(robotId\)\}\/diagnostics/);
+  assert.match(client, /diagnostic\.observations/);
+  assert.match(client, /diagnostic\.alternatives/);
+  assert.match(client, /diagnostic\.recommendedInspection/);
+  assert.match(client, /SIMULATED DATA \/ DECISION SUPPORT/);
 });

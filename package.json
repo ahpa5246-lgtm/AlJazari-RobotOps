@@ -8,7 +8,7 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "node --test",
-    "typecheck": "node --check src/server.js && node --check src/alert-engine.js && node --check src/maintenance-workflow.js && node --check src/incident-replay.js && node --check src/simulator.js && node --check src/analytics.js && node --check src/robot-adapter.js && node --check src/fleet-service.js && node --check public/app.js",
+    "typecheck": "node --check src/server.js && node --check src/alert-engine.js && node --check src/maintenance-workflow.js && node --check src/incident-replay.js && node --check src/diagnostic-copilot.js && node --check src/simulator.js && node --check src/analytics.js && node --check src/robot-adapter.js && node --check src/fleet-service.js && node --check public/app.js",
     "lint": "npm run typecheck",
     "build": "node scripts/build.mjs",
     "verify": "npm run typecheck && npm test && npm run build"

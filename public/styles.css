@@ -153,3 +153,23 @@ dialog::backdrop { background: #020705d9; backdrop-filter: blur(5px); }
 @media (max-width: 720px) {
   .incident-event { grid-template-columns: 1fr; gap: .35rem; }
 }
+
+
+.diagnostic-action { display: grid; grid-template-columns: auto minmax(12rem, 1fr); align-items: center; gap: .8rem 1rem; margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--cyan); background: color-mix(in srgb, var(--cyan) 5%, transparent); }
+.diagnostic-action button { min-height: 44px; padding: .6rem .9rem; border: 1px solid var(--cyan); background: var(--cyan); color: var(--canvas); cursor: pointer; font: 800 .7rem var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+.diagnostic-action button:hover { background: transparent; color: var(--cyan); }
+.diagnostic-action p { margin: 0; color: var(--muted); font-size: .75rem; line-height: 1.55; }
+.diagnostic-detail { max-width: 70ch; }
+.diagnostic-detail h2 { max-width: 12ch; }
+.diagnostic-detail section { margin-top: 1.4rem; }
+.diagnostic-detail h3 { margin: 0 0 .7rem; color: var(--signal); font: 800 .72rem/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.diagnostic-window, .diagnostic-hypothesis { display: grid; gap: .45rem; padding: 1rem; border-inline-start: 3px solid var(--cyan); background: color-mix(in srgb, var(--surface-2) 78%, transparent); }
+.diagnostic-window span, .diagnostic-hypothesis p { margin: 0; color: var(--muted); font: .74rem/1.55 var(--mono); }
+.diagnostic-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--edge); }
+.diagnostic-list li { display: grid; grid-template-columns: minmax(11rem, .8fr) 1.5fr auto; gap: .65rem 1rem; padding: .85rem 0; border-bottom: 1px solid var(--edge); font: .7rem/1.5 var(--mono); }
+.diagnostic-list span, .diagnostic-list time { color: var(--muted); }
+.confidence-notice { padding: .85rem 1rem; border: 1px solid var(--warning); color: var(--warning); font-size: .78rem; line-height: 1.55; }
+
+@media (max-width: 720px) {
+  .diagnostic-action, .diagnostic-list li { grid-template-columns: 1fr; }
+}

@@ -7,4 +7,5 @@
 - Tenant checks currently demonstrate the domain boundary but do not replace production authentication and RBAC.
 - Maintenance suggestions require an acknowledged alert; ticket creation requires a second explicit human confirmation and is idempotent. Neither can perform physical actions.
 - Incident replay reads only tenant-scoped simulator history. It issues no commands, invents no missing position, and exposes no root-cause or validated-prediction claim.
+- Diagnostic output is deterministic decision support. It does not call an LLM, interpret free text, claim confidence or causality, or expose a command route.
 - Public deployment, production database migration, secrets and real robot integration require separate owner and security approval.
