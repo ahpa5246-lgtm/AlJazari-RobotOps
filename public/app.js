@@ -139,7 +139,7 @@ async function openDiagnostic(robotId) {
 
   document.querySelector("#robot-detail").innerHTML = `<article class="detail diagnostic-detail">
     <p class="eyebrow">SIMULATED DATA / DECISION SUPPORT</p>
-    <h2>${t("diagnosticTitle")}</h2>
+    <h2 id="diagnostic-title" tabindex="-1">${t("diagnosticTitle")}</h2>
     <p>${diagnostic.robotId} · ${question}</p>
     <section class="diagnostic-window" aria-labelledby="diagnostic-window-title">
       <h3 id="diagnostic-window-title">${t("evidenceWindow")}</h3>
@@ -153,6 +153,7 @@ async function openDiagnostic(robotId) {
     <p class="confidence-notice">${t("noConfidence")}</p>
     <p class="replay-safety">${t("diagnosticSafety")}</p>
   </article>`;
+  document.querySelector("#diagnostic-title").focus();
 }
 
 async function openRobot(robotId) {
