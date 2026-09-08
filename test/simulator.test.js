@@ -298,11 +298,13 @@ test("mission timeline does not turn a later sample into a missing start transit
   const robot = { id: "AJR-005", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
   const result = timeline.build(robot, [
     { observedAt: "2026-09-07T20:00:00.000Z", mission: { id: "MS-MID", state: "working", progress: 35, distanceMeters: 5 } },
-    { observedAt: "2026-09-07T20:00:30.000Z", mission: { id: "MS-MID", state: "working", progress: 45, distanceMeters: 7 } }
+    { observedAt: "2026-09-07T20:00:30.000Z", mission: { id: "MS-MID", state: "working", progress: 45, distanceMeters: 7 } },
+    { observedAt: "2026-09-07T20:01:00.000Z", mission: { id: null, state: "idle", progress: 0, distanceMeters: 0 } }
   ]);
   assert.equal(result.missions[0].startedAt, null);
   assert.equal(result.missions[0].durationSeconds, null);
   assert.equal(result.missions[0].incompleteEvidence, true);
+  assert.equal(result.currentMission, null);
 });
 
 test("mission timeline reports unsupported capability explicitly", () => {

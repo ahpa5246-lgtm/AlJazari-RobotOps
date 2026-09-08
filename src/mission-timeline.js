@@ -61,13 +61,18 @@ export class MissionTimeline {
       };
     }).sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt));
 
+    const latestMission = ordered.at(-1)?.mission;
+    const currentMission = latestMission?.id && latestMission.state === "working"
+      ? missions.find((mission) => mission.id === latestMission.id) ?? null
+      : null;
+
     return {
       robotId: robot.id,
       organizationId: robot.organizationId,
       clientId: robot.clientId,
       supported: true,
       generatedAt: ordered.at(-1)?.observedAt ?? null,
-      currentMission: missions.find((mission) => mission.status === "working") ?? null,
+      currentMission,
       missions,
       events: events.sort((a, b) => a.observedAt.localeCompare(b.observedAt)),
       capabilityNotice: missions.length ? null : "No mission lifecycle evidence is present in the recorded window.",
