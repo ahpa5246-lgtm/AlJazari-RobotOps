@@ -37,7 +37,7 @@ All POST endpoints mutate in-memory demo state only and cannot issue physical co
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, fourteen deterministic domain tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, fifteen deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
