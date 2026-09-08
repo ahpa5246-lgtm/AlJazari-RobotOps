@@ -8,6 +8,8 @@ Tokens use near-black mineral green, warm operational white, phosphor green, cya
 
 No external visual library is required in this milestone. That keeps the install deterministic, bundle small and mobile fallback reliable. Motion is limited to direct hover/state feedback and is removed under `prefers-reduced-motion`.
 
+The ingestion/provenance milestone has no new visual surface. Existing evidence-ledger composition, bilingual direction, mobile layout, semantic fallback and reduced-motion behavior remain the complete UI contract; provenance is available in the telemetry API for a later bounded inspector rather than exposed as decorative metadata.
+
 The evidence rail now carries the complete operational decision sequence in place: observe → acknowledge → confirm maintenance ticket. State changes are expressed through text, border role and action hierarchy rather than new panels or animation. The cyan confirmation control remains a native 44px button; ticket state has a textual fallback and does not rely on color.
 
 

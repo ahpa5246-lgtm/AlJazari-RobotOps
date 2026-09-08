@@ -12,6 +12,7 @@ import { DiagnosticCopilot } from "../src/diagnostic-copilot.js";
 import { MissionTimeline } from "../src/mission-timeline.js";
 import { MissionAnalytics } from "../src/mission-analytics.js";
 import { InMemoryTelemetryRepository, assertTelemetryRepository } from "../src/telemetry-repository.js";
+import { TelemetryIngestionGateway } from "../src/telemetry-ingestion.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -33,6 +34,88 @@ test("simulator exposes twenty robots with changing timestamped samples", () => 
   const after = adapter.telemetry("AJR-001").at(-1);
   assert.notEqual(before.observedAt, after.observedAt);
   assert.notEqual(before.batteryPercentage, after.batteryPercentage);
+});
+
+test("simulator telemetry carries verified source provenance", () => {
+  const adapter = new SimulatorAdapter();
+  const sample = adapter.telemetry("AJR-001").at(-1);
+  assert.deepEqual(sample.provenance, {
+    gatewayId: "telemetry-ingestion-v1",
+    sourceId: "simulator-primary",
+    adapterId: "deterministic-simulator",
+    transport: "in-process",
+    sequence: 6,
+    receivedAt: sample.observedAt,
+    simulated: true,
+    verified: true
+  });
+  assert.equal(adapter.telemetryIngestion.describe().physicalControl, false);
+});
+
+test("telemetry ingestion enforces source, tenant and monotonic sequence", () => {
+  const repository = new InMemoryTelemetryRepository();
+  const gateway = new TelemetryIngestionGateway({
+    repository,
+    source: { sourceId: "fixture-source", adapterId: "fixture-adapter", transport: "in-process", simulated: true, supportsControl: false }
+  });
+  gateway.registerRobot({ id: "R-1", organizationId: "org-1", clientId: "client-1" });
+  const envelope = {
+    sourceId: "fixture-source",
+    adapterId: "fixture-adapter",
+    transport: "in-process",
+    sequence: 1,
+    receivedAt: "2026-09-08T10:00:01.000Z",
+    robotId: "R-1",
+    organizationId: "org-1",
+    clientId: "client-1",
+    sample: { observedAt: "2026-09-08T10:00:00.000Z", batteryPercentage: 90 }
+  };
+  const receipt = gateway.ingest(envelope);
+  assert.equal(receipt.accepted, true);
+  assert.equal(receipt.provenance.verified, true);
+  assert.equal(repository.query({ robotId: "R-1" }).samples[0].provenance.sourceId, "fixture-source");
+  assert.throws(() => gateway.ingest(envelope), /sequence must be strictly increasing/);
+  assert.throws(() => gateway.ingest({ ...envelope, sequence: 2, clientId: "client-2" }), /registered tenant/);
+  assert.throws(() => gateway.ingest({ ...envelope, sequence: 2, sourceId: "spoofed-source" }), /provenance does not match/);
+});
+
+test("telemetry ingestion fails closed for real sources, commands and invalid receipt time", () => {
+  const repository = new InMemoryTelemetryRepository();
+  assert.throws(() => new TelemetryIngestionGateway({
+    repository,
+    source: { sourceId: "real", adapterId: "vendor", transport: "mqtt", simulated: false, supportsControl: false }
+  }), /simulated sources only/);
+  assert.throws(() => new TelemetryIngestionGateway({
+    repository,
+    source: { sourceId: "unsafe", adapterId: "vendor", transport: "mqtt", simulated: true, supportsControl: true }
+  }), /must not expose physical control/);
+
+  const gateway = new TelemetryIngestionGateway({
+    repository,
+    source: { sourceId: "fixture-source", adapterId: "fixture-adapter", transport: "in-process", simulated: true, supportsControl: false }
+  });
+  gateway.registerRobot({ id: "R-1", organizationId: "org-1", clientId: "client-1" });
+  const envelope = {
+    sourceId: "fixture-source",
+    adapterId: "fixture-adapter",
+    transport: "in-process",
+    sequence: 1,
+    receivedAt: "2026-09-08T10:00:01.000Z",
+    robotId: "R-1",
+    organizationId: "org-1",
+    clientId: "client-1",
+    sample: { observedAt: "2026-09-08T10:00:00.000Z", motor: { command: "move" } }
+  };
+  assert.throws(() => gateway.ingest(envelope), /Control fields are not accepted/);
+  assert.throws(() => gateway.ingest({
+    ...envelope,
+    sample: { observedAt: "2026-09-08T10:00:00.000Z", simulated: false }
+  }), /conflicts with the simulated source boundary/);
+  assert.throws(() => gateway.ingest({
+    ...envelope,
+    receivedAt: "2026-09-08T09:59:59.000Z",
+    sample: { observedAt: "2026-09-08T10:00:00.000Z" }
+  }), /must not precede observedAt/);
 });
 
 test("capability discovery keeps unsupported values unavailable", () => {
