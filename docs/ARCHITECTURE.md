@@ -47,3 +47,9 @@ The response keeps `confidence: null` and `causalConclusion: null`: this prototy
 `MissionTimeline` consumes optional adapter mission telemetry and distinguishes an observed transition from the first observation of a mission already in progress. A mission start is recorded only when the bounded history contains a transition into a new working mission. Terminal states (`completed`, `failed`, `cancelled`), progress, distance and reason codes must be supplied by the adapter; missing values remain null. Duration is calculated only when both observed start and end timestamps exist.
 
 The deterministic simulator emits explicit mission cycles and fictional outcomes for mission-capable robots. Robots without that capability retain `mission: null` and receive an unsupported response. Timeline queries enforce the same organization/client boundary as robot details and expose no command operation.
+
+## Fleet mission analytics
+
+`MissionAnalytics` aggregates tenant-filtered robot histories and `MissionTimeline` records. `mission-analytics-v1` calculates completion, failure and cancellation rates over observed terminal outcomes only; utilization uses telemetry samples from mission-capable robots that report a mission state. Every rate returns its numerator, denominator and eligibility rule. Duration and distance return contributing and excluded record counts, while zero-evidence denominators produce `null`.
+
+The response carries the exact observation window, capability coverage, `confidence: null`, `predictive: false`, `readOnly: true` and `physicalControl: false`. It is a bounded operational summary, not a persisted SLA or prediction.

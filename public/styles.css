@@ -34,9 +34,10 @@ button, input, select, [role="button"] { min-height: 44px; }
 .simulated-label { color: #08110f; background: var(--warning); padding: .38rem .55rem; font-weight: 900; letter-spacing: .06em; }
 .text-button { border: 1px solid var(--edge); background: transparent; color: var(--ink); padding: .45rem .8rem; cursor: pointer; }
 
-.command-shell { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(440px, 1.55fr) minmax(300px, .88fr); grid-template-areas: "mission topology evidence" "fleet fleet evidence"; min-height: calc(100vh - 76px); }
+.command-shell { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(440px, 1.55fr) minmax(300px, .88fr); grid-template-areas: "mission topology evidence" "analytics analytics evidence" "fleet fleet evidence"; min-height: calc(100vh - 76px); }
 .command-shell > * { border-inline-end: 1px solid var(--edge); border-bottom: 1px solid var(--edge); }
 .mission-rail { grid-area: mission; padding: clamp(1.5rem, 3vw, 3rem); }
+.mission-analytics-panel { grid-area: analytics; min-width: 0; }
 .topology-panel { grid-area: topology; min-width: 0; }
 .evidence-panel { grid-area: evidence; border-inline-end: 0; }
 .fleet-panel { grid-area: fleet; }
@@ -103,10 +104,34 @@ dialog::backdrop { background: #020705d9; backdrop-filter: blur(5px); }
 [dir="rtl"] h1 { letter-spacing: -.025em; line-height: 1.08; }
 
 @media (max-width: 1120px) {
-  .command-shell { grid-template-columns: .8fr 1.2fr; grid-template-areas: "mission topology" "fleet fleet" "evidence evidence"; }
+  .command-shell { grid-template-columns: .8fr 1.2fr; grid-template-areas: "mission topology" "analytics analytics" "fleet fleet" "evidence evidence"; }
   .evidence-panel { border-inline-end: 1px solid var(--edge); }
   .evidence-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   .fleet-table { grid-template-columns: repeat(3, 1fr); }
+}
+
+.mission-analytics { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(260px, .75fr); }
+.mission-rate-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-inline-end: 1px solid var(--edge); }
+.mission-rate-grid article { min-height: 132px; padding: 1rem; border-inline-end: 1px solid var(--edge); background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 72%, transparent), transparent); }
+.mission-rate-grid article:last-child { border-inline-end: 0; }
+.mission-rate-grid span { display: block; min-height: 2.2em; color: var(--muted); font: 700 .66rem/1.35 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+.mission-rate-grid strong { display: block; margin: .7rem 0 .45rem; font: 650 clamp(1.55rem, 2.7vw, 2.65rem)/1 var(--mono); }
+.mission-rate-grid small { display: block; color: var(--muted); font: .6rem/1.45 var(--mono); }
+.mission-rate-grid article[data-tone="completion"] strong { color: var(--signal); }
+.mission-rate-grid article[data-tone="failure"] strong { color: var(--critical); }
+.mission-rate-grid article[data-tone="cancellation"] strong { color: var(--warning); }
+.mission-rate-grid article[data-tone="utilization"] strong { color: var(--cyan); }
+.mission-ledger-evidence { display: grid; align-content: center; gap: .65rem; padding: 1rem 1.25rem; background: color-mix(in srgb, var(--surface) 80%, transparent); }
+.mission-ledger-evidence span { padding-inline-start: .65rem; border-inline-start: 2px solid var(--edge); color: var(--muted); font: .63rem/1.5 var(--mono); }
+.mission-ledger-evidence span:first-child { border-color: var(--cyan); color: var(--ink); }
+
+@media (max-width: 900px) {
+  .mission-analytics { grid-template-columns: 1fr; }
+  .mission-rate-grid { border-inline-end: 0; border-bottom: 1px solid var(--edge); }
+}
+@media (max-width: 600px) {
+  .mission-rate-grid { grid-template-columns: repeat(2, 1fr); }
+  .mission-rate-grid article { border-bottom: 1px solid var(--edge); }
 }
 @media (max-width: 720px) {
   .topbar { align-items: flex-start; padding-block: 1rem; gap: 1rem; }.brand small, #clock { display: none; }

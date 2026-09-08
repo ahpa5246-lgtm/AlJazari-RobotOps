@@ -10,6 +10,7 @@ import { MaintenanceWorkflow } from "../src/maintenance-workflow.js";
 import { IncidentReplay } from "../src/incident-replay.js";
 import { DiagnosticCopilot } from "../src/diagnostic-copilot.js";
 import { MissionTimeline } from "../src/mission-timeline.js";
+import { MissionAnalytics } from "../src/mission-analytics.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -343,4 +344,72 @@ test("mission timeline UI consumes the tenant-safe read-only contract", () => {
   assert.match(client, /timeline\.missions/);
   assert.match(client, /SIMULATED DATA \/ READ-ONLY MISSION EVIDENCE/);
   assert.match(client, /mission-timeline-title.*focus/);
+});
+
+test("mission analytics exposes exact denominators, coverage and exclusions", () => {
+  const robots = [
+    { id: "R-1", capabilities: { missions: true } },
+    { id: "R-2", capabilities: { missions: false } }
+  ];
+  const histories = new Map([["R-1", [
+    { observedAt: "2026-09-07T20:00:00.000Z", mission: { state: "working" } },
+    { observedAt: "2026-09-07T20:00:30.000Z", mission: { state: "completed" } },
+    { observedAt: "2026-09-07T20:01:00.000Z", mission: null }
+  ]]]);
+  const timelines = [{ robotId: "R-1", supported: true, missions: [
+    { status: "completed", durationSeconds: 60, distanceMeters: 12, incompleteEvidence: false },
+    { status: "failed", durationSeconds: 30, distanceMeters: 5, incompleteEvidence: false },
+    { status: "cancelled", durationSeconds: null, distanceMeters: 3, incompleteEvidence: true },
+    { status: "working", durationSeconds: null, distanceMeters: 4, incompleteEvidence: true }
+  ] }];
+  const result = new MissionAnalytics().build({ robots, histories, timelines });
+
+  assert.deepEqual(result.outcomes.completion, { valuePercent: 33.33, numerator: 1, denominator: 3, eligibility: "observed terminal missions only" });
+  assert.equal(result.outcomes.failure.valuePercent, 33.33);
+  assert.equal(result.outcomes.cancellation.valuePercent, 33.33);
+  assert.equal(result.utilization.valuePercent, 50);
+  assert.equal(result.utilization.excludedSamples, 1);
+  assert.deepEqual(result.coverage, { missionCapableRobots: 1, totalRobots: 2, unsupportedRobots: 1 });
+  assert.equal(result.duration.value, 45);
+  assert.equal(result.duration.contributingRecords, 2);
+  assert.equal(result.duration.excludedRecords, 2);
+  assert.equal(result.distance.value, 24);
+  assert.equal(result.confidence, null);
+  assert.equal(result.predictive, false);
+  assert.equal(result.physicalControl, false);
+});
+
+test("mission analytics returns unavailable rates instead of zero for empty denominators", () => {
+  const result = new MissionAnalytics().build({
+    robots: [{ id: "R-1", capabilities: { missions: true } }],
+    histories: new Map([["R-1", []]]),
+    timelines: [{ robotId: "R-1", supported: true, missions: [] }]
+  });
+  assert.equal(result.outcomes.completion.valuePercent, null);
+  assert.equal(result.outcomes.completion.denominator, 0);
+  assert.equal(result.utilization.valuePercent, null);
+  assert.equal(result.duration.value, null);
+  assert.equal(result.distance.value, null);
+});
+
+test("fleet mission analytics stays inside the requested tenant", () => {
+  const service = new FleetService(new SimulatorAdapter());
+  const tenant = service.missionAnalytics({ organizationId: "org-aljazari-demo", clientId: "client-rashid" });
+  assert.equal(tenant.coverage.totalRobots, 7);
+  assert.equal(tenant.coverage.missionCapableRobots, 7);
+  assert.equal(tenant.observationWindow.telemetrySampleCount, 42);
+  assert.equal(tenant.formulaVersion, "mission-analytics-v1");
+  assert.deepEqual(tenant.scope, { organizationId: "org-aljazari-demo", clientId: "client-rashid" });
+  assert.equal(tenant.readOnly, true);
+});
+
+test("mission analytics UI renders API evidence rather than decorative constants", () => {
+  const client = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  const page = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  assert.match(client, /fetch\("\/api\/analytics\/missions"\)/);
+  assert.match(client, /metric\.numerator/);
+  assert.match(client, /metric\.denominator/);
+  assert.match(client, /missionAnalytics\.duration\.excludedRecords/);
+  assert.match(client, /missionAnalytics\.formulaVersion/);
+  assert.match(page, /id="mission-analytics"/);
 });

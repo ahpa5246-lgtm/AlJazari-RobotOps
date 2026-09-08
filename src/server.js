@@ -21,6 +21,12 @@ const server = createServer(async (request, response) => {
         status: url.searchParams.get("status") || undefined
       }));
     }
+    if (request.method === "GET" && url.pathname === "/api/analytics/missions") {
+      return json(response, 200, service.missionAnalytics({
+        organizationId: "org-aljazari-demo",
+        clientId: url.searchParams.get("clientId") || undefined
+      }));
+    }
     if (request.method === "GET" && url.pathname === "/api/alerts") {
       return json(response, 200, {
         simulated: true,

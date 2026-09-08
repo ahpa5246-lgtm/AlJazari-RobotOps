@@ -6,15 +6,17 @@ import { MaintenanceWorkflow } from "./maintenance-workflow.js";
 import { IncidentReplay } from "./incident-replay.js";
 import { DiagnosticCopilot } from "./diagnostic-copilot.js";
 import { MissionTimeline } from "./mission-timeline.js";
+import { MissionAnalytics } from "./mission-analytics.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot(), missionTimeline = new MissionTimeline()) {
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot(), missionTimeline = new MissionTimeline(), missionAnalytics = new MissionAnalytics()) {
     this.adapter = assertRobotAdapter(adapter);
     this.alertEngine = alertEngine;
     this.maintenanceWorkflow = maintenanceWorkflow;
     this.incidentReplay = incidentReplay;
     this.diagnosticCopilot = diagnosticCopilot;
     this.missionTimelineBuilder = missionTimeline;
+    this.missionAnalyticsBuilder = missionAnalytics;
   }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
@@ -128,6 +130,21 @@ export class FleetService {
     if (tenant.organizationId && robot.organizationId !== tenant.organizationId) return null;
     if (tenant.clientId && robot.clientId !== tenant.clientId) return null;
     return this.missionTimelineBuilder.build(robot, this.adapter.telemetry(robotId));
+  }
+
+  missionAnalytics(tenant = {}) {
+    const robots = this.adapter.listRobots()
+      .filter((robot) => !tenant.organizationId || robot.organizationId === tenant.organizationId)
+      .filter((robot) => !tenant.clientId || robot.clientId === tenant.clientId);
+    const histories = new Map(robots.map((robot) => [robot.id, this.adapter.telemetry(robot.id)]));
+    const timelines = robots.map((robot) => this.missionTimelineBuilder.build(robot, histories.get(robot.id)));
+    return {
+      ...this.missionAnalyticsBuilder.build({ robots, histories, timelines }),
+      scope: {
+        organizationId: tenant.organizationId ?? null,
+        clientId: tenant.clientId ?? null
+      }
+    };
   }
 
   #decorate(robot) {
