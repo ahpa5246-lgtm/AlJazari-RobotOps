@@ -45,11 +45,13 @@ Fleet mission analytics aggregate those records with formula version `mission-an
 
 Bounded telemetry history is read through an explicit repository contract rather than simulator-owned arrays. The endpoint exposes stable ascending timestamp order, inclusive time bounds, an exclusive continuation cursor, a maximum 120-sample page, tenant scope and retention/source metadata. The current repository is deterministic, in-memory and non-durable; it is not production storage.
 
+Simulator samples enter that repository through `telemetry-ingestion-v1`. The gateway verifies configured source identity, tenant ownership, per-robot sequence and observed/received timestamps, then attaches source provenance that payloads cannot provide themselves. It rejects real sources and command fields in this prototype; it is not a production broker, credential verifier or physical-control path.
+
 All POST endpoints mutate in-memory demo state only and cannot issue physical commands. Alert acknowledgement and maintenance-ticket creation each require an explicit human actor and confirmation. A ticket can be created only from acknowledged evidence.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, thirty-three deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, thirty-six deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 

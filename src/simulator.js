@@ -1,4 +1,5 @@
 import { InMemoryTelemetryRepository, assertTelemetryRepository } from "./telemetry-repository.js";
+import { TelemetryIngestionGateway } from "./telemetry-ingestion.js";
 
 const CLIENTS = [
   { id: "client-sindbad", name: "Sindbad Restaurant Group", site: { id: "site-karrada", name: "Karrada Flagship" } },
@@ -20,7 +21,11 @@ export class SimulatorAdapter {
     this.startTime = new Date(startTime).getTime();
     this.robots = Array.from({ length: count }, (_, index) => this.#createRobot(index));
     this.telemetryRepository = assertTelemetryRepository(telemetryRepository);
-    for (const robot of this.robots) this.telemetryRepository.registerRobot(robot);
+    this.telemetryIngestion = new TelemetryIngestionGateway({
+      repository: this.telemetryRepository,
+      source: { sourceId: "simulator-primary", ...this.describe() }
+    });
+    for (const robot of this.robots) this.telemetryIngestion.registerRobot(robot);
     this.faults = new Map();
     for (let index = 0; index < 6; index += 1) this.tick();
   }
@@ -69,7 +74,17 @@ export class SimulatorAdapter {
       if (fault === "wheel-friction" && robot.capabilities.motors) sample.motorCurrent = 6.4 + this.tickNumber % 2 * 0.2;
       if (fault === "network-instability") sample.networkLatency = 520 + this.tickNumber % 4 * 20;
       if (fault === "localization-loss" && robot.capabilities.sensors) sample.localizationQuality = 42 - this.tickNumber % 3;
-      this.telemetryRepository.append(robot.id, sample);
+      this.telemetryIngestion.ingest({
+        sourceId: "simulator-primary",
+        adapterId: this.describe().adapterId,
+        transport: this.describe().transport,
+        sequence: this.tickNumber,
+        receivedAt: observedAt,
+        robotId: robot.id,
+        organizationId: robot.organizationId,
+        clientId: robot.clientId,
+        sample
+      });
       robot.lastSeen = observedAt;
       robot.connectionStatus = sample.networkLatency > 500 ? "warning" : "online";
     }
