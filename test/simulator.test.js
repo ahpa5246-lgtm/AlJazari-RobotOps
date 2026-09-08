@@ -9,6 +9,7 @@ import { AlertEngine } from "../src/alert-engine.js";
 import { MaintenanceWorkflow } from "../src/maintenance-workflow.js";
 import { IncidentReplay } from "../src/incident-replay.js";
 import { DiagnosticCopilot } from "../src/diagnostic-copilot.js";
+import { MissionTimeline } from "../src/mission-timeline.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -256,4 +257,90 @@ test("diagnostic UI consumes evidence, alternatives and safety fields through th
   assert.match(client, /diagnostic\.alternatives/);
   assert.match(client, /diagnostic\.recommendedInspection/);
   assert.match(client, /SIMULATED DATA \/ DECISION SUPPORT/);
+});
+
+test("mission timeline derives lifecycle duration and distance from recorded transitions", () => {
+  const timeline = new MissionTimeline();
+  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
+  const history = [
+    { observedAt: "2026-09-07T20:00:00.000Z", mission: { id: null, state: "idle", progress: 0, distanceMeters: 0 } },
+    { observedAt: "2026-09-07T20:00:30.000Z", mission: { id: "MS-1", state: "working", progress: 0, distanceMeters: 0 } },
+    { observedAt: "2026-09-07T20:01:00.000Z", mission: { id: "MS-1", state: "working", progress: 55, distanceMeters: 8 } },
+    { observedAt: "2026-09-07T20:01:30.000Z", mission: { id: "MS-1", state: "completed", progress: 100, distanceMeters: 12 } }
+  ];
+  const result = timeline.build(robot, history);
+  assert.equal(result.missions.length, 1);
+  assert.equal(result.missions[0].status, "completed");
+  assert.equal(result.missions[0].durationSeconds, 60);
+  assert.equal(result.missions[0].distanceMeters, 12);
+  assert.equal(result.missions[0].incompleteEvidence, false);
+  assert.deepEqual(result.events.map((event) => event.state), ["working", "completed"]);
+  assert.deepEqual(result.events.map((event) => event.kind), ["transition", "transition"]);
+  assert.equal(result.physicalControl, false);
+});
+
+test("mission timeline preserves a reported terminal reason without inventing a missing start", () => {
+  const timeline = new MissionTimeline();
+  const robot = { id: "AJR-004", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
+  const result = timeline.build(robot, [{
+    observedAt: "2026-09-07T20:05:00.000Z",
+    mission: { id: "MS-TRUNCATED", state: "failed", progress: 61, distanceMeters: 17.5, reasonCode: "NAVIGATION_BLOCKED" }
+  }]);
+  assert.equal(result.missions[0].startedAt, null);
+  assert.equal(result.missions[0].durationSeconds, null);
+  assert.equal(result.missions[0].reasonCode, "NAVIGATION_BLOCKED");
+  assert.equal(result.missions[0].incompleteEvidence, true);
+  assert.equal(result.events[0].kind, "first-observed");
+});
+
+test("mission timeline does not turn a later sample into a missing start transition", () => {
+  const timeline = new MissionTimeline();
+  const robot = { id: "AJR-005", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
+  const result = timeline.build(robot, [
+    { observedAt: "2026-09-07T20:00:00.000Z", mission: { id: "MS-MID", state: "working", progress: 35, distanceMeters: 5 } },
+    { observedAt: "2026-09-07T20:00:30.000Z", mission: { id: "MS-MID", state: "working", progress: 45, distanceMeters: 7 } },
+    { observedAt: "2026-09-07T20:01:00.000Z", mission: { id: null, state: "idle", progress: 0, distanceMeters: 0 } }
+  ]);
+  assert.equal(result.missions[0].startedAt, null);
+  assert.equal(result.missions[0].durationSeconds, null);
+  assert.equal(result.missions[0].incompleteEvidence, true);
+  assert.equal(result.currentMission, null);
+});
+
+test("mission timeline reports unsupported capability explicitly", () => {
+  const result = new MissionTimeline().build({ id: "AJR-003", organizationId: "org-1", clientId: "client-1", capabilities: { missions: false } }, []);
+  assert.equal(result.supported, false);
+  assert.equal(result.missions.length, 0);
+  assert.match(result.capabilityNotice, /unsupported/);
+  assert.equal(result.readOnly, true);
+});
+
+test("deterministic simulator emits explicit mission outcomes only for capable robots", () => {
+  const adapter = new SimulatorAdapter();
+  for (let index = 0; index < 30; index += 1) adapter.tick();
+  const capableStates = adapter.listRobots().filter((robot) => robot.capabilities.missions)
+    .flatMap((robot) => adapter.telemetry(robot.id).map((sample) => sample.mission?.state));
+  assert.equal(capableStates.includes("completed"), true);
+  assert.equal(capableStates.includes("failed"), true);
+  assert.equal(capableStates.includes("cancelled"), true);
+  const unsupported = adapter.listRobots().find((robot) => !robot.capabilities.missions);
+  assert.equal(adapter.telemetry(unsupported.id).every((sample) => sample.mission === null), true);
+});
+
+test("fleet mission timeline queries enforce tenant scope", () => {
+  const service = new FleetService(new SimulatorAdapter());
+  assert.equal(service.missionTimeline("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-sindbad" }), null);
+  const visible = service.missionTimeline("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-rashid" });
+  assert.equal(visible.clientId, "client-rashid");
+  assert.equal(visible.simulated, true);
+  assert.equal(visible.physicalControl, false);
+});
+
+test("mission timeline UI consumes the tenant-safe read-only contract", () => {
+  const client = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  assert.match(client, /\/api\/robots\/\$\{encodeURIComponent\(robotId\)\}\/missions/);
+  assert.match(client, /timeline\.events/);
+  assert.match(client, /timeline\.missions/);
+  assert.match(client, /SIMULATED DATA \/ READ-ONLY MISSION EVIDENCE/);
+  assert.match(client, /mission-timeline-title.*focus/);
 });

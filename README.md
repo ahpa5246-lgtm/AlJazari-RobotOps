@@ -24,6 +24,7 @@ Open `http://localhost:3000`.
 - `GET /api/fleet?search=&status=&clientId=`
 - `GET /api/robots/:id?clientId=`
 - `GET /api/robots/:id/diagnostics?clientId=&question=`
+- `GET /api/robots/:id/missions?clientId=`
 - `GET /api/alerts?clientId=`
 - `POST /api/alerts/:id/acknowledge` with `{ "actor": "demo-technician", "confirmed": true }`
 - `GET /api/incidents?clientId=`
@@ -36,11 +37,13 @@ Incident replay endpoints reconstruct a bounded, read-only evidence window from 
 
 The diagnostic endpoint applies documented deterministic rules to recorded telemetry. It returns the exact evidence window, a cautious working hypothesis, alternatives and human inspection steps. The free-text question is recorded for traceability but is not semantically interpreted in this milestone. Confidence remains `null` because no validated probability model exists.
 
+Mission timelines are reconstructed from adapter-reported mission transitions. Start time, terminal status, duration, distance and reason codes remain `null` or incomplete when the recorded window or robot capability does not supply enough evidence. The endpoint is read-only and cannot start, cancel or reroute a robot.
+
 All POST endpoints mutate in-memory demo state only and cannot issue physical commands. Alert acknowledgement and maintenance-ticket creation each require an explicit human actor and confirmation. A ticket can be created only from acknowledged evidence.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, nineteen deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, twenty-six deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
@@ -48,6 +51,7 @@ All POST endpoints mutate in-memory demo state only and cannot issue physical co
 - Alert and maintenance state are in-memory only; authentication/RBAC and database adapters are later architecture gates.
 - Incident replay is a bounded evidence reconstruction, not a physics simulator or proof of root cause.
 - The diagnostic assistant is deterministic decision support, not an LLM diagnosis. It does not interpret free text, prove causality or display an unvalidated confidence percentage.
+- Mission history exists only inside the bounded in-memory telemetry window. Partial lifecycles remain visibly incomplete and are not backfilled.
 - Inspection windows are documented severity rules, not predicted failure probabilities. Tickets never trigger repair or physical control.
 - Health and anomaly rules are transparent prototype heuristics, not validated failure prediction.
 - Canvas topology is a progressive visualization; the semantic fleet registry remains available without it.
