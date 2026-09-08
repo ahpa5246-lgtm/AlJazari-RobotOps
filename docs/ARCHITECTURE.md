@@ -27,3 +27,10 @@ Anomaly rules currently expose measured value, explicit threshold, baseline mean
 ## Maintenance suggestion lifecycle
 
 `MaintenanceWorkflow` accepts only alerts already acknowledged by a named human. `maintenance-window-v1` maps severity to an explicit inspection window: critical 24 hours, high 120 hours, warning 336 hours and info 720 hours. The output deliberately contains no probability or confidence score. Creating a ticket is a second separately confirmed human action, is idempotent per source alert, preserves the exact anomaly evidence and remains tenant-scoped. Tickets are simulated in-memory work records and cannot issue repair or robot commands.
+
+
+## Incident replay
+
+`IncidentReplay` derives each incident from existing simulator telemetry and alert evidence; it does not create decorative coordinates or infer an unobserved cause. A replay contains a bounded eight-sample window, the exact trigger metric/value/threshold, timestamped event codes and an optional trajectory only when the adapter supplied pose data. Robots without position capability keep the chronological evidence timeline and expose `spatialReplayAvailable: false`.
+
+Replay is read-only, tenant-scoped and explicitly simulated. It performs no interpolation, mission control, physical command or causal diagnosis. A later persistence layer may replace adapter history storage without changing this evidence contract.
