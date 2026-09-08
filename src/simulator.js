@@ -1,3 +1,5 @@
+import { InMemoryTelemetryRepository, assertTelemetryRepository } from "./telemetry-repository.js";
+
 const CLIENTS = [
   { id: "client-sindbad", name: "Sindbad Restaurant Group", site: { id: "site-karrada", name: "Karrada Flagship" } },
   { id: "client-rashid", name: "Al-Rashid Hotel", site: { id: "site-lobby", name: "Main Lobby" } },
@@ -11,13 +13,14 @@ const MODELS = [
 ];
 
 export class SimulatorAdapter {
-  constructor({ seed = 20260907, count = 20, startTime = "2026-09-07T20:00:00.000Z" } = {}) {
+  constructor({ seed = 20260907, count = 20, startTime = "2026-09-07T20:00:00.000Z", telemetryRepository = new InMemoryTelemetryRepository() } = {}) {
     this.seed = seed;
     this.random = mulberry32(seed);
     this.tickNumber = 0;
     this.startTime = new Date(startTime).getTime();
     this.robots = Array.from({ length: count }, (_, index) => this.#createRobot(index));
-    this.history = new Map(this.robots.map((robot) => [robot.id, []]));
+    this.telemetryRepository = assertTelemetryRepository(telemetryRepository);
+    for (const robot of this.robots) this.telemetryRepository.registerRobot(robot);
     this.faults = new Map();
     for (let index = 0; index < 6; index += 1) this.tick();
   }
@@ -28,7 +31,12 @@ export class SimulatorAdapter {
 
   listRobots() { return this.robots.map((robot) => structuredClone(robot)); }
   capabilities(robotId) { return structuredClone(this.#robot(robotId).capabilities); }
-  telemetry(robotId) { return structuredClone(this.history.get(robotId) ?? []); }
+  telemetry(robotId) {
+    return this.telemetryRepository.query({
+      robotId,
+      limit: this.telemetryRepository.describe().maxQueryLimit
+    })?.samples ?? [];
+  }
 
   injectFault(robotId, fault) {
     const supported = ["motor-overheat", "wheel-friction", "network-instability", "localization-loss"];
@@ -61,9 +69,7 @@ export class SimulatorAdapter {
       if (fault === "wheel-friction" && robot.capabilities.motors) sample.motorCurrent = 6.4 + this.tickNumber % 2 * 0.2;
       if (fault === "network-instability") sample.networkLatency = 520 + this.tickNumber % 4 * 20;
       if (fault === "localization-loss" && robot.capabilities.sensors) sample.localizationQuality = 42 - this.tickNumber % 3;
-      const robotHistory = this.history.get(robot.id);
-      robotHistory.push(sample);
-      if (robotHistory.length > 120) robotHistory.shift();
+      this.telemetryRepository.append(robot.id, sample);
       robot.lastSeen = observedAt;
       robot.connectionStatus = sample.networkLatency > 500 ? "warning" : "online";
     }

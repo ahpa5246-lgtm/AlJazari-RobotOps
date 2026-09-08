@@ -75,6 +75,19 @@ const server = createServer(async (request, response) => {
       });
       return json(response, timeline ? 200 : 404, timeline ?? { error: "Robot not found in tenant" });
     }
+    if (request.method === "GET" && /^\/api\/robots\/[^/]+\/telemetry$/.test(url.pathname)) {
+      const robotId = decodeURIComponent(url.pathname.split("/").at(-2));
+      const history = service.telemetryHistory(robotId, {
+        organizationId: "org-aljazari-demo",
+        clientId: url.searchParams.get("clientId") || undefined
+      }, {
+        startAt: url.searchParams.get("startAt") || undefined,
+        endAt: url.searchParams.get("endAt") || undefined,
+        cursor: url.searchParams.get("cursor") || undefined,
+        limit: url.searchParams.get("limit") ? Number(url.searchParams.get("limit")) : undefined
+      });
+      return json(response, history ? 200 : 404, history ?? { error: "Robot not found in tenant" });
+    }
     if (request.method === "GET" && url.pathname.startsWith("/api/robots/")) {
       const robot = service.robot(decodeURIComponent(url.pathname.split("/").at(-1)), {
         organizationId: "org-aljazari-demo",
