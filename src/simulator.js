@@ -55,7 +55,7 @@ export class SimulatorAdapter {
         networkLatency: round(48 + (index % 5) * 9 + Math.abs(Math.sin(phase)) * 18),
         signalStrength: round(91 - (index % 6) * 4),
         position: robot.capabilities.pose ? { x: round(12 + Math.cos(phase) * (3 + index % 4)), y: round(8 + Math.sin(phase) * (2 + index % 3)), orientation: round(phase % (Math.PI * 2)) } : null,
-        mission: robot.capabilities.missions ? { id: `MS-${1000 + index}`, state: index % 5 === 0 ? "idle" : "working", progress: (this.tickNumber * 7 + index * 11) % 100 } : null
+        mission: robot.capabilities.missions ? missionAt(this.tickNumber, index) : null
       };
       if (fault === "motor-overheat" && robot.capabilities.motors) sample.motorTemperature = 69 + this.tickNumber % 3;
       if (fault === "wheel-friction" && robot.capabilities.motors) sample.motorCurrent = 6.4 + this.tickNumber % 2 * 0.2;
@@ -108,3 +108,26 @@ function mulberry32(seed) {
 }
 
 function round(value) { return Math.round(value * 100) / 100; }
+
+function missionAt(tickNumber, robotIndex) {
+  const absolute = tickNumber + robotIndex * 5;
+  const cycle = Math.floor(absolute / 24);
+  const phase = absolute % 24;
+  if (phase < 3 || phase > 18) return { id: null, state: "idle", progress: 0, distanceMeters: 0, reasonCode: null };
+
+  const id = `MS-${String(robotIndex + 1).padStart(3, "0")}-${String(cycle + 1).padStart(3, "0")}`;
+  const workingProgress = Math.min(94, Math.round((phase - 3) / 15 * 94));
+  if (phase < 18) {
+    return { id, state: "working", progress: workingProgress, distanceMeters: round(workingProgress * (0.36 + robotIndex % 4 * 0.04)), reasonCode: null };
+  }
+
+  const selector = (robotIndex + cycle) % 10;
+  const state = selector === 0 ? "failed" : selector === 1 ? "cancelled" : "completed";
+  return {
+    id,
+    state,
+    progress: state === "completed" ? 100 : workingProgress,
+    distanceMeters: round((state === "completed" ? 100 : workingProgress) * (0.36 + robotIndex % 4 * 0.04)),
+    reasonCode: state === "failed" ? "NAVIGATION_BLOCKED" : state === "cancelled" ? "DEMO_OPERATOR_CANCELLED" : null
+  };
+}

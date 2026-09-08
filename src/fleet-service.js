@@ -5,14 +5,16 @@ import { AlertEngine } from "./alert-engine.js";
 import { MaintenanceWorkflow } from "./maintenance-workflow.js";
 import { IncidentReplay } from "./incident-replay.js";
 import { DiagnosticCopilot } from "./diagnostic-copilot.js";
+import { MissionTimeline } from "./mission-timeline.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot()) {
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot(), missionTimeline = new MissionTimeline()) {
     this.adapter = assertRobotAdapter(adapter);
     this.alertEngine = alertEngine;
     this.maintenanceWorkflow = maintenanceWorkflow;
     this.incidentReplay = incidentReplay;
     this.diagnosticCopilot = diagnosticCopilot;
+    this.missionTimelineBuilder = missionTimeline;
   }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
@@ -55,7 +57,8 @@ export class FleetService {
       history: this.adapter.telemetry(robotId).slice(-30),
       alerts: this.alertEngine.list({ robotId }),
       maintenance: this.maintenance({ ...tenant, robotId }),
-      incidents: this.incidents({ ...tenant, robotId })
+      incidents: this.incidents({ ...tenant, robotId }),
+      missionTimeline: this.missionTimeline(robotId, tenant)
     };
   }
 
@@ -117,6 +120,14 @@ export class FleetService {
       maintenance: this.maintenanceWorkflow.listTickets({ ...tenant, robotId }),
       question
     });
+  }
+
+  missionTimeline(robotId, tenant = {}) {
+    const robot = this.adapter.listRobots().find((item) => item.id === robotId);
+    if (!robot) return null;
+    if (tenant.organizationId && robot.organizationId !== tenant.organizationId) return null;
+    if (tenant.clientId && robot.clientId !== tenant.clientId) return null;
+    return this.missionTimelineBuilder.build(robot, this.adapter.telemetry(robotId));
   }
 
   #decorate(robot) {

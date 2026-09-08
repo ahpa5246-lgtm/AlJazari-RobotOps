@@ -15,3 +15,5 @@ Incident replay reuses the existing evidence rail and native dialog instead of a
 
 
 The diagnostic assistant extends the same evidence-first visual language rather than becoming a chat-shaped novelty. A native 44px action opens a semantic, keyboard-readable report: evidence window, working hypothesis, measured observations, alternative explanations and human inspection. Amber separates the absence of validated confidence from operational severity. The report stacks to one column on narrow screens, inherits RTL/LTR order and the global reduced-motion fallback, and adds no package or animation cost.
+
+Mission history uses a flight-recorder composition: one current-mission strip, a chronological transition spine and compact evidence records. Status is expressed with text plus square signal marks rather than color alone. Unsupported and partial lifecycles stay visible. The native dialog transfers focus to its heading, stacks to one column on mobile, preserves RTL/LTR order and adds no animation, renderer or package cost.

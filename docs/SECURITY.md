@@ -8,4 +8,5 @@
 - Maintenance suggestions require an acknowledged alert; ticket creation requires a second explicit human confirmation and is idempotent. Neither can perform physical actions.
 - Incident replay reads only tenant-scoped simulator history. It issues no commands, invents no missing position, and exposes no root-cause or validated-prediction claim.
 - Diagnostic output is deterministic decision support. It does not call an LLM, interpret free text, claim confidence or causality, or expose a command route.
+- Mission timelines are tenant-scoped, read-only reconstructions from simulator telemetry. They cannot start, cancel, reroute or otherwise control a robot, and missing lifecycle evidence is never synthesized.
 - Public deployment, production database migration, secrets and real robot integration require separate owner and security approval.

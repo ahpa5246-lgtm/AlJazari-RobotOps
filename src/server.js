@@ -61,6 +61,14 @@ const server = createServer(async (request, response) => {
       }, url.searchParams.get("question") || "");
       return json(response, diagnostic ? 200 : 404, diagnostic ?? { error: "Robot not found in tenant" });
     }
+    if (request.method === "GET" && /^\/api\/robots\/[^/]+\/missions$/.test(url.pathname)) {
+      const robotId = decodeURIComponent(url.pathname.split("/").at(-2));
+      const timeline = service.missionTimeline(robotId, {
+        organizationId: "org-aljazari-demo",
+        clientId: url.searchParams.get("clientId") || undefined
+      });
+      return json(response, timeline ? 200 : 404, timeline ?? { error: "Robot not found in tenant" });
+    }
     if (request.method === "GET" && url.pathname.startsWith("/api/robots/")) {
       const robot = service.robot(decodeURIComponent(url.pathname.split("/").at(-1)), {
         organizationId: "org-aljazari-demo",

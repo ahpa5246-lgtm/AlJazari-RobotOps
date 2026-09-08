@@ -41,3 +41,9 @@ Replay is read-only, tenant-scoped and explicitly simulated. It performs no inte
 `DiagnosticCopilot` is a deterministic, read-only domain service layered over recorded telemetry, alert, incident and maintenance identifiers. Rule set `diagnostic-rules-v1` maps only active threshold evidence to a cautious working hypothesis. Every response exposes the measured value, threshold, baseline mean, z-score, evidence time range, alternatives that remain possible and a human inspection step.
 
 The response keeps `confidence: null` and `causalConclusion: null`: this prototype has no validated probability model and cannot prove root cause. Free-text questions are bounded and retained for traceability but deliberately not semantically interpreted. Insufficient evidence produces `INSUFFICIENT_EVIDENCE`, never a guessed diagnosis. Queries are tenant-scoped and the service has no command method.
+
+## Mission lifecycle
+
+`MissionTimeline` consumes optional adapter mission telemetry and distinguishes an observed transition from the first observation of a mission already in progress. A mission start is recorded only when the bounded history contains a transition into a new working mission. Terminal states (`completed`, `failed`, `cancelled`), progress, distance and reason codes must be supplied by the adapter; missing values remain null. Duration is calculated only when both observed start and end timestamps exist.
+
+The deterministic simulator emits explicit mission cycles and fictional outcomes for mission-capable robots. Robots without that capability retain `mission: null` and receive an unsupported response. Timeline queries enforce the same organization/client boundary as robot details and expose no command operation.
