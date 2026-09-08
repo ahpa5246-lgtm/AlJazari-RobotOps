@@ -53,7 +53,13 @@ All POST endpoints mutate in-memory demo state only and cannot issue physical co
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, forty deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs JavaScript syntax checks, 46 deterministic domain/presentation-contract tests and a reproducible production artifact build. GitHub Actions runs the same command. The `typecheck` and `lint` names currently map to syntax validation, not TypeScript or a semantic linter.
+
+## White and violet operations studio
+
+The redesigned interface adds a tenant-aware site atlas, an illustrated robot specimen, two-robot measurement comparison, component-level health explanation and pause/manual-refresh controls. Registry filters affect the atlas and summary; the mission ledger clearly identifies its full-fleet scope. Unsupported signals remain unavailable. The specimen is an illustration, not a model of real hardware.
+
+See [the design contract](docs/DESIGN.md) for catalog choices, token contrast, responsive/RTL and reduced-motion behavior, transfer budget, and the open browser-review checklist. Browser visual acceptance is pending because the review environment denied the local preview; passing domain tests does not establish visual quality.
 
 ## Known limits
 
