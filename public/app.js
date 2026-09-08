@@ -140,7 +140,7 @@ async function openDiagnostic(robotId) {
   document.querySelector("#robot-detail").innerHTML = `<article class="detail diagnostic-detail">
     <p class="eyebrow">SIMULATED DATA / DECISION SUPPORT</p>
     <h2>${t("diagnosticTitle")}</h2>
-    <p>${diagnostic.robotId} · ${diagnostic.question}</p>
+    <p>${diagnostic.robotId} · ${question}</p>
     <section class="diagnostic-window" aria-labelledby="diagnostic-window-title">
       <h3 id="diagnostic-window-title">${t("evidenceWindow")}</h3>
       <span>${diagnostic.timeRange.startedAt ? new Date(diagnostic.timeRange.startedAt).toLocaleString(locale) : "—"} — ${diagnostic.timeRange.endedAt ? new Date(diagnostic.timeRange.endedAt).toLocaleString(locale) : "—"}</span>
