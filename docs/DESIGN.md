@@ -9,3 +9,6 @@ Tokens use near-black mineral green, warm operational white, phosphor green, cya
 No external visual library is required in this milestone. That keeps the install deterministic, bundle small and mobile fallback reliable. Motion is limited to direct hover/state feedback and is removed under `prefers-reduced-motion`.
 
 The evidence rail now carries the complete operational decision sequence in place: observe → acknowledge → confirm maintenance ticket. State changes are expressed through text, border role and action hierarchy rather than new panels or animation. The cyan confirmation control remains a native 44px button; ticket state has a textual fallback and does not rely on color.
+
+
+Incident replay reuses the existing evidence rail and native dialog instead of adding a second visualization engine. The text-first ordered timeline shows timestamps, event codes and measured values; position is supplementary and disappears truthfully when unsupported. It preserves the industrial instrument thesis, RTL/LTR reading order, visible focus, 44px targets, narrow-screen stacking and the existing reduced-motion fallback without adding package or rendering cost.

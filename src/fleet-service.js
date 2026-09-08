@@ -3,12 +3,14 @@ import { SimulatorAdapter } from "./simulator.js";
 import { assertRobotAdapter } from "./robot-adapter.js";
 import { AlertEngine } from "./alert-engine.js";
 import { MaintenanceWorkflow } from "./maintenance-workflow.js";
+import { IncidentReplay } from "./incident-replay.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow()) {
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay()) {
     this.adapter = assertRobotAdapter(adapter);
     this.alertEngine = alertEngine;
     this.maintenanceWorkflow = maintenanceWorkflow;
+    this.incidentReplay = incidentReplay;
   }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
@@ -23,6 +25,8 @@ export class FleetService {
 
     const alerts = this.alertEngine.list().filter((alert) => robots.some((robot) => robot.id === alert.robotId));
     const robotIds = new Set(robots.map((robot) => robot.id));
+    const histories = new Map(robots.map((robot) => [robot.id, this.adapter.telemetry(robot.id)]));
+    const incidents = this.incidentReplay.list(robots, histories, alerts);
     return {
       generatedAt: robots[0]?.telemetry.observedAt ?? new Date().toISOString(),
       simulated: true,
@@ -33,6 +37,7 @@ export class FleetService {
         suggestions: this.maintenanceWorkflow.listSuggestions(alerts),
         tickets: this.maintenanceWorkflow.listTickets().filter((ticket) => robotIds.has(ticket.robotId))
       },
+      incidents,
       robots
     };
   }
@@ -47,7 +52,8 @@ export class FleetService {
       ...decorated,
       history: this.adapter.telemetry(robotId).slice(-30),
       alerts: this.alertEngine.list({ robotId }),
-      maintenance: this.maintenance({ ...tenant, robotId })
+      maintenance: this.maintenance({ ...tenant, robotId }),
+      incidents: this.incidents({ ...tenant, robotId })
     };
   }
 
@@ -79,6 +85,19 @@ export class FleetService {
     const alert = this.alertEngine.list(tenant).find((item) => item.id === alertId);
     if (!alert) throw new Error("Alert not found in tenant");
     return this.maintenanceWorkflow.confirm(alert, confirmation);
+  }
+
+  incidents(tenant = {}) {
+    const robots = this.adapter.listRobots()
+      .filter((robot) => !tenant.organizationId || robot.organizationId === tenant.organizationId)
+      .filter((robot) => !tenant.clientId || robot.clientId === tenant.clientId)
+      .filter((robot) => !tenant.robotId || robot.id === tenant.robotId);
+    const histories = new Map(robots.map((robot) => [robot.id, this.adapter.telemetry(robot.id)]));
+    return this.incidentReplay.list(robots, histories, this.alertEngine.list(tenant));
+  }
+
+  incident(incidentId, tenant = {}) {
+    return this.incidents(tenant).find((incident) => incident.id === incidentId) ?? null;
   }
 
   #decorate(robot) {

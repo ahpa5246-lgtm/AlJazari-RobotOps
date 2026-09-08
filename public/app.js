@@ -1,6 +1,6 @@
 const copy = {
-  en: { product: "ROBOT OPERATIONS INTELLIGENCE", liveOperations: "LIVE OPERATIONS / BAGHDAD", title: "Fleet command, without vendor blind spots.", lede: "Twenty virtual robots report through one capability-aware interface. Unsupported signals stay visibly unsupported.", topologyEyebrow: "FLEET TOPOLOGY", topology: "Operational field", evidenceEyebrow: "EXPLAINABLE EVIDENCE", evidence: "Why the system is concerned", registryEyebrow: "UNIVERSAL ROBOT REGISTRY", registry: "Fleet identities", search: "Search", state: "State", all: "All states", noEvidence: "No active anomaly evidence. Values remain simulated and this prototype makes no prediction accuracy claim.", updated: "Telemetry received", health: "health", inject: "Inject confirmed demo fault", noResults: "No robots match these filters.", unsupported: "Unsupported", total: "Total", online: "Online", working: "Working", idle: "Idle", warning: "Warning", critical: "Critical", acknowledge: "Acknowledge", acknowledged: "Acknowledged", occurrences: "occurrences", suppressed: "duplicates suppressed", recommendInspection: "Human inspection is recommended. No automatic physical action is permitted.", confirmTicket: "Confirm maintenance ticket", ticketOpen: "Maintenance ticket open", inspectWithin: "rule-based inspection window", hours: "hours" },
-  ar: { product: "ذكاء عمليات الروبوتات", liveOperations: "عمليات مباشرة / بغداد", title: "قيادة أسطول بلا نقاط عمياء بين الشركات.", lede: "عشرون روبوتًا افتراضيًا ترسل بياناتها عبر واجهة موحّدة تراعي القدرات. ما لا يدعمه الروبوت يبقى ظاهرًا بوضوح على أنه غير مدعوم.", topologyEyebrow: "طوبولوجيا الأسطول", topology: "المجال التشغيلي", evidenceEyebrow: "أدلة قابلة للتفسير", evidence: "لماذا يشعر النظام بالقلق؟", registryEyebrow: "السجل الموحّد للروبوتات", registry: "هويات الأسطول", search: "بحث", state: "الحالة", all: "كل الحالات", noEvidence: "لا توجد أدلة شذوذ نشطة. البيانات محاكاة ولا يدّعي هذا النموذج دقة تنبؤية.", updated: "وصلت التليمترية", health: "الصحة", inject: "حقن عطل تجريبي مؤكد", noResults: "لا توجد روبوتات تطابق المرشحات.", unsupported: "غير مدعوم", total: "الإجمالي", online: "متصل", working: "يعمل", idle: "خامل", warning: "تحذير", critical: "حرج", acknowledge: "إقرار بشري", acknowledged: "تم الإقرار", occurrences: "مرات الرصد", suppressed: "تنبيهات مكررة حُجبت", recommendInspection: "يُنصح بفحص بشري. لا يُسمح بأي إجراء مادي تلقائي.", confirmTicket: "تأكيد تذكرة الصيانة", ticketOpen: "تذكرة الصيانة مفتوحة", inspectWithin: "مهلة الفحص حسب القاعدة", hours: "ساعة" }
+  en: { product: "ROBOT OPERATIONS INTELLIGENCE", liveOperations: "LIVE OPERATIONS / BAGHDAD", title: "Fleet command, without vendor blind spots.", lede: "Twenty virtual robots report through one capability-aware interface. Unsupported signals stay visibly unsupported.", topologyEyebrow: "FLEET TOPOLOGY", topology: "Operational field", evidenceEyebrow: "EXPLAINABLE EVIDENCE", evidence: "Why the system is concerned", registryEyebrow: "UNIVERSAL ROBOT REGISTRY", registry: "Fleet identities", search: "Search", state: "State", all: "All states", noEvidence: "No active anomaly evidence. Values remain simulated and this prototype makes no prediction accuracy claim.", updated: "Telemetry received", health: "health", inject: "Inject confirmed demo fault", noResults: "No robots match these filters.", unsupported: "Unsupported", total: "Total", online: "Online", working: "Working", idle: "Idle", warning: "Warning", critical: "Critical", acknowledge: "Acknowledge", acknowledged: "Acknowledged", occurrences: "occurrences", suppressed: "duplicates suppressed", recommendInspection: "Human inspection is recommended. No automatic physical action is permitted.", confirmTicket: "Confirm maintenance ticket", ticketOpen: "Maintenance ticket open", inspectWithin: "rule-based inspection window", hours: "hours", replayIncident: "Replay incident", incidentReplay: "Incident replay", replayWindow: "Replay window", noSpatialReplay: "Position was not supplied by this robot; the evidence timeline remains available without a spatial animation.", readOnlyReplay: "Read-only reconstruction from recorded simulator telemetry. It issues no physical command and makes no causal conclusion.", samples: "samples" },
+  ar: { product: "ذكاء عمليات الروبوتات", liveOperations: "عمليات مباشرة / بغداد", title: "قيادة أسطول بلا نقاط عمياء بين الشركات.", lede: "عشرون روبوتًا افتراضيًا ترسل بياناتها عبر واجهة موحّدة تراعي القدرات. ما لا يدعمه الروبوت يبقى ظاهرًا بوضوح على أنه غير مدعوم.", topologyEyebrow: "طوبولوجيا الأسطول", topology: "المجال التشغيلي", evidenceEyebrow: "أدلة قابلة للتفسير", evidence: "لماذا يشعر النظام بالقلق؟", registryEyebrow: "السجل الموحّد للروبوتات", registry: "هويات الأسطول", search: "بحث", state: "الحالة", all: "كل الحالات", noEvidence: "لا توجد أدلة شذوذ نشطة. البيانات محاكاة ولا يدّعي هذا النموذج دقة تنبؤية.", updated: "وصلت التليمترية", health: "الصحة", inject: "حقن عطل تجريبي مؤكد", noResults: "لا توجد روبوتات تطابق المرشحات.", unsupported: "غير مدعوم", total: "الإجمالي", online: "متصل", working: "يعمل", idle: "خامل", warning: "تحذير", critical: "حرج", acknowledge: "إقرار بشري", acknowledged: "تم الإقرار", occurrences: "مرات الرصد", suppressed: "تنبيهات مكررة حُجبت", recommendInspection: "يُنصح بفحص بشري. لا يُسمح بأي إجراء مادي تلقائي.", confirmTicket: "تأكيد تذكرة الصيانة", ticketOpen: "تذكرة الصيانة مفتوحة", inspectWithin: "مهلة الفحص حسب القاعدة", hours: "ساعة", replayIncident: "إعادة الحادثة", incidentReplay: "إعادة الحادثة", replayWindow: "نافذة الإعادة", noSpatialReplay: "لم يرسل هذا الروبوت موقعًا؛ يبقى تسلسل الأدلة متاحًا دون حركة مكانية.", readOnlyReplay: "إعادة بناء للقراءة فقط من تليمترية المحاكي المسجلة. لا تصدر أمرًا ماديًا ولا تستنتج سببًا قاطعًا.", samples: "عينات" }
 };
 
 let language = localStorage.getItem("robotops-language") || "en";
@@ -31,6 +31,7 @@ function render() {
   document.querySelector("#evidence-list").innerHTML = alerts.length ? alerts.slice(0, 8).map(alertCard).join("") : `<p class="empty">${t("noEvidence")}</p>`;
   document.querySelectorAll(".ack-alert").forEach((button) => button.addEventListener("click", () => acknowledgeAlert(button.dataset.alertId, button)));
   document.querySelectorAll(".create-ticket").forEach((button) => button.addEventListener("click", () => createMaintenanceTicket(button.dataset.alertId, button)));
+  document.querySelectorAll(".replay-incident").forEach((button) => button.addEventListener("click", () => openIncident(button.dataset.incidentId)));
   drawTopology();
 }
 
@@ -53,6 +54,7 @@ function alertCard(alert) {
   const anomaly = alert.evidence;
   const suggestion = snapshot.maintenance?.suggestions.find((item) => item.sourceAlertId === alert.id);
   const ticket = snapshot.maintenance?.tickets.find((item) => item.sourceAlertId === alert.id);
+  const incident = snapshot.incidents?.find((item) => item.sourceAlertId === alert.id);
   let action = `<button class="ack-alert" type="button" data-alert-id="${alert.id}">${t("acknowledge")}</button>`;
   if (ticket) {
     action = `<span class="ticket-open">${t("ticketOpen")} · ${ticket.id}</span>`;
@@ -65,7 +67,7 @@ function alertCard(alert) {
     <strong>${alert.robotId} · ${alert.code}</strong><p>${t("recommendInspection")}</p>
     <dl><div><dt>metric</dt><dd>${anomaly.metric}</dd></div><div><dt>value / threshold</dt><dd>${anomaly.value} / ${anomaly.threshold}</dd></div><div><dt>baseline mean</dt><dd>${anomaly.baselineMean}</dd></div><div><dt>z-score</dt><dd>${anomaly.zScore}</dd></div></dl>
     <div class="alert-meta"><span>${alert.occurrences} ${t("occurrences")}</span><span>${alert.suppressedOccurrences} ${t("suppressed")}</span></div>
-    ${action}
+    <div class="incident-action">${action}${incident ? `<button class="replay-incident" type="button" data-incident-id="${incident.id}">${t("replayIncident")}</button>` : ""}</div>
   </article>`;
 }
 
@@ -95,6 +97,27 @@ async function createMaintenanceTicket(alertId, button) {
     throw new Error("Maintenance ticket confirmation failed");
   }
   await load();
+}
+
+async function openIncident(incidentId) {
+  const response = await fetch(`/api/incidents/${encodeURIComponent(incidentId)}/replay`);
+  if (!response.ok) throw new Error("Incident replay request failed");
+  const replay = await response.json();
+  const locale = language === "ar" ? "ar-IQ" : "en-GB";
+  const signal = (event) => [
+    ["battery", event.telemetry.batteryPercentage, "%"],
+    ["motor current", event.telemetry.motorCurrent, "A"],
+    ["motor temperature", event.telemetry.motorTemperature, "°C"],
+    ["network", event.telemetry.networkLatency, "ms"],
+    ["localization", event.telemetry.localizationQuality, "%"]
+  ].filter(([, value]) => value !== null && value !== undefined)
+    .map(([label, value, unit]) => `<span><b>${label}</b> ${value}${unit}</span>`).join("");
+  const timeline = replay.events.map((event) => {
+    const position = event.position ? `<span><b>position</b> ${event.position.x.toFixed(2)}, ${event.position.y.toFixed(2)}</span>` : "";
+    return `<li class="incident-event"><time datetime="${event.observedAt}">${new Date(event.observedAt).toLocaleTimeString(locale)}</time><strong>${event.codes.join(" · ")}</strong><div class="incident-signal-grid">${signal(event)}${position}</div></li>`;
+  }).join("");
+  document.querySelector("#robot-detail").innerHTML = `<article class="detail incident-detail"><p class="eyebrow">SIMULATED DATA / READ-ONLY</p><h2>${t("incidentReplay")}</h2><p>${replay.robotId} · ${replay.trigger.metric}: ${replay.trigger.value} / ${replay.trigger.threshold}</p><div class="replay-summary"><strong>${t("replayWindow")}</strong><span>${new Date(replay.windowStartAt).toLocaleString(locale)} — ${new Date(replay.windowEndAt).toLocaleString(locale)}</span><span>${replay.sampleCount} ${t("samples")}</span></div>${replay.spatialReplayAvailable ? "" : `<p class="capability-notice">${t("noSpatialReplay")}</p>`}<ol class="incident-timeline">${timeline}</ol><p class="replay-safety">${t("readOnlyReplay")}</p></article>`;
+  dialog.showModal();
 }
 
 async function openRobot(robotId) {

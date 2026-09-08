@@ -36,6 +36,23 @@ const server = createServer(async (request, response) => {
         clientId: url.searchParams.get("clientId") || undefined
       }));
     }
+    if (request.method === "GET" && url.pathname === "/api/incidents") {
+      return json(response, 200, {
+        simulated: true,
+        incidents: service.incidents({
+          organizationId: "org-aljazari-demo",
+          clientId: url.searchParams.get("clientId") || undefined
+        })
+      });
+    }
+    if (request.method === "GET" && /^\/api\/incidents\/[^/]+\/replay$/.test(url.pathname)) {
+      const incidentId = decodeURIComponent(url.pathname.split("/").at(-2));
+      const incident = service.incident(incidentId, {
+        organizationId: "org-aljazari-demo",
+        clientId: url.searchParams.get("clientId") || undefined
+      });
+      return json(response, incident ? 200 : 404, incident ?? { error: "Incident not found in tenant" });
+    }
     if (request.method === "GET" && url.pathname.startsWith("/api/robots/")) {
       const robot = service.robot(decodeURIComponent(url.pathname.split("/").at(-1)), {
         organizationId: "org-aljazari-demo",
