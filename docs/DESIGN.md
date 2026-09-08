@@ -12,3 +12,6 @@ The evidence rail now carries the complete operational decision sequence in plac
 
 
 Incident replay reuses the existing evidence rail and native dialog instead of adding a second visualization engine. The text-first ordered timeline shows timestamps, event codes and measured values; position is supplementary and disappears truthfully when unsupported. It preserves the industrial instrument thesis, RTL/LTR reading order, visible focus, 44px targets, narrow-screen stacking and the existing reduced-motion fallback without adding package or rendering cost.
+
+
+The diagnostic assistant extends the same evidence-first visual language rather than becoming a chat-shaped novelty. A native 44px action opens a semantic, keyboard-readable report: evidence window, working hypothesis, measured observations, alternative explanations and human inspection. Amber separates the absence of validated confidence from operational severity. The report stacks to one column on narrow screens, inherits RTL/LTR order and the global reduced-motion fallback, and adds no package or animation cost.
