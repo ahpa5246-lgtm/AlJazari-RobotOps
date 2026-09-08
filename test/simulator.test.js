@@ -13,6 +13,7 @@ import { MissionTimeline } from "../src/mission-timeline.js";
 import { MissionAnalytics } from "../src/mission-analytics.js";
 import { InMemoryTelemetryRepository, assertTelemetryRepository } from "../src/telemetry-repository.js";
 import { TelemetryIngestionGateway } from "../src/telemetry-ingestion.js";
+import { FixtureRestTransport, RestMonitoringAdapter } from "../src/rest-monitoring-adapter.js";
 
 test("adapter contract rejects incomplete vendor integrations", () => {
   assert.throws(() => assertRobotAdapter({ describe() { return {}; } }), /missing listRobots/);
@@ -116,6 +117,96 @@ test("telemetry ingestion fails closed for real sources, commands and invalid re
     receivedAt: "2026-09-08T09:59:59.000Z",
     sample: { observedAt: "2026-09-08T10:00:00.000Z" }
   }), /must not precede observedAt/);
+});
+
+test("fixture REST adapter conforms to the robot contract and preserves optional capabilities", () => {
+  const fixtures = JSON.parse(readFileSync(new URL("../fixtures/rest-monitoring-example.json", import.meta.url), "utf8"));
+  const transport = new FixtureRestTransport(fixtures);
+  const adapter = new RestMonitoringAdapter({ transport });
+
+  assert.doesNotThrow(() => assertRobotAdapter(adapter));
+  assert.deepEqual(transport.describe(), {
+    transportId: "deterministic-fixture-rest",
+    network: false,
+    credentials: false,
+    readOnly: true
+  });
+  assert.equal(adapter.describe().supportsControl, false);
+  assert.equal(adapter.command, undefined);
+  assert.equal(adapter.listRobots().length, 2);
+  assert.deepEqual(adapter.capabilities("REST-002"), { battery: true });
+  assert.equal(Object.hasOwn(adapter.listRobots()[1], "manufacturer"), false);
+});
+
+test("fixture REST adapter normalizes monitoring samples through verified ingestion", () => {
+  const fixtures = JSON.parse(readFileSync(new URL("../fixtures/rest-monitoring-example.json", import.meta.url), "utf8"));
+  const adapter = new RestMonitoringAdapter({ transport: new FixtureRestTransport(fixtures) });
+  const receipt = adapter.tick();
+
+  assert.deepEqual(receipt, { accepted: 2, simulated: true, readOnly: true, physicalControl: false });
+  const first = adapter.telemetry("REST-001")[0];
+  assert.equal(first.batteryPercentage, 87);
+  assert.equal(Object.hasOwn(first, "position"), false);
+  assert.deepEqual(first.provenance, {
+    gatewayId: "telemetry-ingestion-v1",
+    sourceId: "fixture-rest-source",
+    adapterId: "rest-monitoring-v1",
+    transport: "fixture-rest",
+    sequence: 1,
+    receivedAt: "2026-09-08T12:45:01.000Z",
+    simulated: true,
+    verified: true
+  });
+});
+
+test("fixture REST adapter rejects tenant, provenance, timestamp, capability and actuator violations before storage", () => {
+  const base = JSON.parse(readFileSync(new URL("../fixtures/rest-monitoring-example.json", import.meta.url), "utf8"));
+  const cases = [
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].tenant.clientId = "client-other"; },
+      error: /registered tenant/
+    },
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].sample.motorCurrent = 2.4; },
+      error: /requires declared motors capability/
+    },
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].sample.actuator = { command: "move" }; },
+      error: /cannot contain control or actuator fields/
+    },
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].sourceId = "spoofed"; },
+      error: /cannot assert source provenance/
+    },
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].sample.provenance = { verified: true }; },
+      error: /cannot assert provenance/
+    },
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].sample.observedAt = "2026-09-08 12:45:00"; },
+      error: /explicit timezone/
+    },
+    {
+      mutate(fixtures) { fixtures["/robots/REST-001/telemetry"].sample.simulated = false; },
+      error: /simulated telemetry only/
+    }
+  ];
+
+  for (const scenario of cases) {
+    const fixtures = structuredClone(base);
+    scenario.mutate(fixtures);
+    const adapter = new RestMonitoringAdapter({ transport: new FixtureRestTransport(fixtures) });
+    assert.throws(() => adapter.tick(), scenario.error);
+    assert.equal(adapter.telemetry("REST-001").length, 0);
+  }
+});
+
+test("fixture REST adapter refuses transports that could use network or credentials", () => {
+  const unsafe = {
+    describe() { return { readOnly: true, network: true, credentials: false }; },
+    get() { return { robots: [] }; }
+  };
+  assert.throws(() => new RestMonitoringAdapter({ transport: unsafe }), /offline and credential-free/);
 });
 
 test("capability discovery keeps unsupported values unavailable", () => {
