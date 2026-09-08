@@ -65,3 +65,11 @@ The contract requires strictly increasing timestamps, stable ascending results, 
 `TelemetryIngestionGateway` is the monitoring-only boundary in front of the repository. A configured source declares a source ID, adapter ID and transport, and must be explicitly simulated with physical control disabled. Every envelope repeats the registered organization/client/robot identity, carries a strictly increasing per-robot sequence and separates observed time from received time. Accepted samples receive immutable gateway-owned provenance; payloads cannot self-assert provenance or contain command/control fields.
 
 The simulator now writes through this gateway, so stored evidence identifies its source and ingestion sequence. The current gate deliberately rejects real telemetry and is not a network listener, authentication layer, signature verifier or production message broker. MQTT, WebSocket and REST adapters must later authenticate their source before this boundary without weakening tenant, ordering or control-separation checks.
+
+## Fixture REST monitoring adapter
+
+`RestMonitoringAdapter` is the first non-simulator adapter example behind `assertRobotAdapter` and `TelemetryIngestionGateway`. It depends on an injected transport exposing deterministic GET-style fixture responses for robot discovery and telemetry. The bundled `FixtureRestTransport` declares `network: false`, `credentials: false` and `readOnly: true`; no global `fetch`, socket, vendor SDK or secret is used.
+
+Robot discovery requires explicit organization/client/site identity. Capability normalization retains only supported contract keys that the source actually supplied. Telemetry fields are accepted only when their corresponding capability was explicitly declared, while absent optional values remain absent. Every sample still passes source, tenant, sequence and timestamp verification at the ingestion boundary.
+
+This adapter is monitoring-only. It exposes no command method, actuator payload or control endpoint, and fixtures containing control-shaped fields fail before storage. A production REST connector would need an approved credential provider, TLS/pinning policy, retry/rate-limit behavior and source authentication without weakening these boundaries.

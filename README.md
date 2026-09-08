@@ -47,11 +47,13 @@ Bounded telemetry history is read through an explicit repository contract rather
 
 Simulator samples enter that repository through `telemetry-ingestion-v1`. The gateway verifies configured source identity, tenant ownership, per-robot sequence and observed/received timestamps, then attaches source provenance that payloads cannot provide themselves. It rejects real sources and command fields in this prototype; it is not a production broker, credential verifier or physical-control path.
 
+`RestMonitoringAdapter` demonstrates a second adapter behind the same contracts. It reads deterministic JSON fixtures through an injected `FixtureRestTransport`, normalizes only explicitly supplied capabilities and telemetry, and sends accepted samples through `telemetry-ingestion-v1`. The fixture transport is offline, credential-free and GET-only; the adapter has no command method, control route or actuator schema. It is an integration example, not a live vendor connector.
+
 All POST endpoints mutate in-memory demo state only and cannot issue physical commands. Alert acknowledgement and maintenance-ticket creation each require an explicit human actor and confirmation. A ticket can be created only from acknowledged evidence.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, thirty-six deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, forty deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
@@ -62,6 +64,7 @@ All POST endpoints mutate in-memory demo state only and cannot issue physical co
 - Mission history exists only inside the bounded in-memory telemetry window. Partial lifecycles remain visibly incomplete and are not backfilled.
 - Fleet mission analytics describe only the current bounded in-memory window; they are not historical SLAs, forecasts or validated business-performance claims.
 - The telemetry repository retains at most 120 samples per robot, is erased on restart and provides no production database, encryption-at-rest or backup guarantee.
+- The REST monitoring example uses local deterministic fixtures only. It performs no network I/O, authentication or vendor API negotiation and must not be presented as a production connector.
 - Inspection windows are documented severity rules, not predicted failure probabilities. Tickets never trigger repair or physical control.
 - Health and anomaly rules are transparent prototype heuristics, not validated failure prediction.
 - Canvas topology is a progressive visualization; the semantic fleet registry remains available without it.

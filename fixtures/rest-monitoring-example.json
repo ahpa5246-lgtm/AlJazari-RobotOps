@@ -1,0 +1,64 @@
+{
+  "/robots": {
+    "robots": [
+      {
+        "robotId": "REST-001",
+        "tenant": {
+          "organizationId": "org-aljazari-demo",
+          "clientId": "client-fixture",
+          "siteId": "site-fixture-lab"
+        },
+        "manufacturer": "Fixture Robotics",
+        "model": "Monitor-One",
+        "serialNumber": "SIMULATED-REST-001",
+        "capabilities": {
+          "battery": true,
+          "pose": false,
+          "missions": false,
+          "motors": false,
+          "sensors": false,
+          "network": true
+        }
+      },
+      {
+        "robotId": "REST-002",
+        "tenant": {
+          "organizationId": "org-aljazari-demo",
+          "clientId": "client-fixture",
+          "siteId": "site-fixture-lab"
+        },
+        "capabilities": {
+          "battery": true
+        }
+      }
+    ]
+  },
+  "/robots/REST-001/telemetry": {
+    "sequence": 1,
+    "receivedAt": "2026-09-08T12:45:01.000Z",
+    "robotId": "REST-001",
+    "tenant": {
+      "organizationId": "org-aljazari-demo",
+      "clientId": "client-fixture"
+    },
+    "sample": {
+      "observedAt": "2026-09-08T12:45:00.000Z",
+      "batteryPercentage": 87,
+      "networkLatency": 64,
+      "signalStrength": 82
+    }
+  },
+  "/robots/REST-002/telemetry": {
+    "sequence": 1,
+    "receivedAt": "2026-09-08T12:45:01.000Z",
+    "robotId": "REST-002",
+    "tenant": {
+      "organizationId": "org-aljazari-demo",
+      "clientId": "client-fixture"
+    },
+    "sample": {
+      "observedAt": "2026-09-08T12:45:00.000Z",
+      "batteryPercentage": 72
+    }
+  }
+}
