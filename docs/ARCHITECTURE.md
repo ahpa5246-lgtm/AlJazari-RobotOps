@@ -34,3 +34,10 @@ Anomaly rules currently expose measured value, explicit threshold, baseline mean
 `IncidentReplay` derives each incident from existing simulator telemetry and alert evidence; it does not create decorative coordinates or infer an unobserved cause. A replay contains a bounded eight-sample window, the exact trigger metric/value/threshold, timestamped event codes and an optional trajectory only when the adapter supplied pose data. Robots without position capability keep the chronological evidence timeline and expose `spatialReplayAvailable: false`.
 
 Replay is read-only, tenant-scoped and explicitly simulated. It performs no interpolation, mission control, physical command or causal diagnosis. A later persistence layer may replace adapter history storage without changing this evidence contract.
+
+
+## Evidence-grounded diagnostic assistant
+
+`DiagnosticCopilot` is a deterministic, read-only domain service layered over recorded telemetry, alert, incident and maintenance identifiers. Rule set `diagnostic-rules-v1` maps only active threshold evidence to a cautious working hypothesis. Every response exposes the measured value, threshold, baseline mean, z-score, evidence time range, alternatives that remain possible and a human inspection step.
+
+The response keeps `confidence: null` and `causalConclusion: null`: this prototype has no validated probability model and cannot prove root cause. Free-text questions are bounded and retained for traceability but deliberately not semantically interpreted. Insufficient evidence produces `INSUFFICIENT_EVIDENCE`, never a guessed diagnosis. Queries are tenant-scoped and the service has no command method.
