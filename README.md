@@ -23,6 +23,7 @@ Open `http://localhost:3000`.
 - `GET /api/health`
 - `GET /api/fleet?search=&status=&clientId=`
 - `GET /api/robots/:id?clientId=`
+- `GET /api/robots/:id/diagnostics?clientId=&question=`
 - `GET /api/alerts?clientId=`
 - `POST /api/alerts/:id/acknowledge` with `{ "actor": "demo-technician", "confirmed": true }`
 - `GET /api/incidents?clientId=`
@@ -33,17 +34,20 @@ Open `http://localhost:3000`.
 
 Incident replay endpoints reconstruct a bounded, read-only evidence window from recorded simulator samples. Missing position capability is reported explicitly; no path is interpolated and no causal conclusion is generated.
 
+The diagnostic endpoint applies documented deterministic rules to recorded telemetry. It returns the exact evidence window, a cautious working hypothesis, alternatives and human inspection steps. The free-text question is recorded for traceability but is not semantically interpreted in this milestone. Confidence remains `null` because no validated probability model exists.
+
 All POST endpoints mutate in-memory demo state only and cannot issue physical commands. Alert acknowledgement and maintenance-ticket creation each require an explicit human actor and confirmation. A ticket can be created only from acknowledged evidence.
 
 ## Verification
 
-`npm run verify` performs syntax/type-safety checks available without dependencies, fifteen deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
+`npm run verify` performs syntax/type-safety checks available without dependencies, nineteen deterministic domain and UI-contract tests and a reproducible production artifact build. GitHub Actions runs the same command.
 
 ## Known limits
 
 - In-memory demo persistence only.
 - Alert and maintenance state are in-memory only; authentication/RBAC and database adapters are later architecture gates.
 - Incident replay is a bounded evidence reconstruction, not a physics simulator or proof of root cause.
+- The diagnostic assistant is deterministic decision support, not an LLM diagnosis. It does not interpret free text, prove causality or display an unvalidated confidence percentage.
 - Inspection windows are documented severity rules, not predicted failure probabilities. Tickets never trigger repair or physical control.
 - Health and anomaly rules are transparent prototype heuristics, not validated failure prediction.
 - Canvas topology is a progressive visualization; the semantic fleet registry remains available without it.
