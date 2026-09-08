@@ -4,13 +4,15 @@ import { assertRobotAdapter } from "./robot-adapter.js";
 import { AlertEngine } from "./alert-engine.js";
 import { MaintenanceWorkflow } from "./maintenance-workflow.js";
 import { IncidentReplay } from "./incident-replay.js";
+import { DiagnosticCopilot } from "./diagnostic-copilot.js";
 
 export class FleetService {
-  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay()) {
+  constructor(adapter = new SimulatorAdapter(), alertEngine = new AlertEngine(), maintenanceWorkflow = new MaintenanceWorkflow(), incidentReplay = new IncidentReplay(), diagnosticCopilot = new DiagnosticCopilot()) {
     this.adapter = assertRobotAdapter(adapter);
     this.alertEngine = alertEngine;
     this.maintenanceWorkflow = maintenanceWorkflow;
     this.incidentReplay = incidentReplay;
+    this.diagnosticCopilot = diagnosticCopilot;
   }
 
   snapshot({ organizationId, clientId, search = "", status } = {}) {
@@ -98,6 +100,23 @@ export class FleetService {
 
   incident(incidentId, tenant = {}) {
     return this.incidents(tenant).find((incident) => incident.id === incidentId) ?? null;
+  }
+
+  diagnostic(robotId, tenant = {}, question = "") {
+    const robot = this.adapter.listRobots().find((item) => item.id === robotId);
+    if (!robot) return null;
+    if (tenant.organizationId && robot.organizationId !== tenant.organizationId) return null;
+    if (tenant.clientId && robot.clientId !== tenant.clientId) return null;
+    const decorated = this.#decorate(robot);
+    const history = this.adapter.telemetry(robotId);
+    return this.diagnosticCopilot.analyze({
+      robot: decorated,
+      history,
+      alerts: this.alertEngine.list({ ...tenant, robotId }),
+      incidents: this.incidents({ ...tenant, robotId }),
+      maintenance: this.maintenanceWorkflow.listTickets({ ...tenant, robotId }),
+      question
+    });
   }
 
   #decorate(robot) {
