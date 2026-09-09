@@ -61,6 +61,10 @@ test("shipped identity is generic and keeps explicit simulation and control boun
   assert.match(shipped, /SIMULATED DATA/);
   assert.match(shipped, /No physical control/);
   assert.match(design, /unaffiliated with any real company/i);
+  assert.match(app, /delivery-strip/);
+  assert.match(app, /pickupStop/);
+  assert.match(app, /dropoffStop/);
+  assert.match(app, /routeProgress/);
 });
 
 test("simulator telemetry carries verified source provenance", () => {
