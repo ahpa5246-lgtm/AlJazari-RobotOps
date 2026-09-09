@@ -4,11 +4,11 @@
       {
         "robotId": "REST-001",
         "tenant": {
-          "organizationId": "org-aljazari-demo",
+          "organizationId": "org-parcel-grid-demo",
           "clientId": "client-fixture",
           "siteId": "site-fixture-lab"
         },
-        "manufacturer": "Fixture Robotics",
+        "manufacturer": "Fictional Fixture Fleet",
         "model": "Monitor-One",
         "serialNumber": "SIMULATED-REST-001",
         "capabilities": {
@@ -23,7 +23,7 @@
       {
         "robotId": "REST-002",
         "tenant": {
-          "organizationId": "org-aljazari-demo",
+          "organizationId": "org-parcel-grid-demo",
           "clientId": "client-fixture",
           "siteId": "site-fixture-lab"
         },
@@ -38,7 +38,7 @@
     "receivedAt": "2026-09-08T12:45:01.000Z",
     "robotId": "REST-001",
     "tenant": {
-      "organizationId": "org-aljazari-demo",
+      "organizationId": "org-parcel-grid-demo",
       "clientId": "client-fixture"
     },
     "sample": {
@@ -53,7 +53,7 @@
     "receivedAt": "2026-09-08T12:45:01.000Z",
     "robotId": "REST-002",
     "tenant": {
-      "organizationId": "org-aljazari-demo",
+      "organizationId": "org-parcel-grid-demo",
       "clientId": "client-fixture"
     },
     "sample": {

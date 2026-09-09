@@ -24,6 +24,10 @@ export class MissionTimeline {
       if (!record) {
         record = {
           id: mission.id,
+          parcelId: mission.parcelId ?? null,
+          pickupStop: mission.pickupStop ?? null,
+          dropoffStop: mission.dropoffStop ?? null,
+          payloadKg: Number.isFinite(mission.payloadKg) ? mission.payloadKg : null,
           robotId: robot.id,
           status: mission.state,
           startedAt: observedStart ? sample.observedAt : null,
@@ -91,6 +95,11 @@ function eventFrom(robot, mission, observedAt, kind) {
     observedAt,
     state: mission.state,
     progress: Number.isFinite(mission.progress) ? mission.progress : null,
+    routeProgress: Number.isFinite(mission.routeProgress) ? mission.routeProgress : null,
+    parcelId: mission.parcelId ?? null,
+    pickupStop: mission.pickupStop ?? null,
+    dropoffStop: mission.dropoffStop ?? null,
+    payloadKg: Number.isFinite(mission.payloadKg) ? mission.payloadKg : null,
     distanceMeters: Number.isFinite(mission.distanceMeters) ? mission.distanceMeters : null,
     reasonCode: mission.reasonCode ?? null,
     kind,

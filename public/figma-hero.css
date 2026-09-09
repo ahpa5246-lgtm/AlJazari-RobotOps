@@ -1,0 +1,165 @@
+/* Figma node 37:430 adaptation — compact navigation, open white stage,
+   two tilted parcel-operation surfaces and modelled pastel route bodies. */
+.topbar {
+  width:min(100%,1536px);
+  min-height:78px;
+  margin:auto;
+  padding:0 clamp(1rem,4vw,4rem);
+  display:grid;
+  grid-template-columns:auto minmax(360px,1fr) auto;
+  gap:clamp(1.5rem,4vw,4.5rem);
+  border:0;
+}
+.topbar .workspace-nav {
+  position:static;
+  min-height:78px;
+  padding:0;
+  gap:clamp(1.1rem,2.5vw,2.7rem);
+  background:transparent;
+  border:0;
+  backdrop-filter:none;
+}
+.topbar .workspace-nav a {
+  min-height:44px;
+  color:#11131a;
+  border:0;
+  font-size:.74rem;
+  font-weight:650;
+}
+.topbar .workspace-nav a:hover,.topbar .workspace-nav a:first-child { color:#5048d8; }
+.topbar .nav-note { display:none; }
+.brand-mark { width:42px;height:42px;font-size:.78rem; }
+.brand strong { font-size:1rem;letter-spacing:.1em; }
+.brand small { display:none; }
+.topbar-status { gap:.7rem; }
+.topbar-status time { display:none; }
+.simulated-label { padding:.42rem .65rem;font-size:.55rem; }
+.text-button { border-radius:999px;padding:.4rem .8rem; }
+
+.session-bar {
+  position:relative;
+  z-index:4;
+  min-height:50px;
+  padding:.25rem clamp(1rem,4vw,4rem);
+  color:#6d7280;
+}
+.session-bar>div { background:rgba(255,255,255,.84);box-shadow:0 8px 24px rgba(62,68,100,.06); }
+
+.command-shell {
+  grid-template-columns:minmax(320px,.78fr) minmax(570px,1.22fr);
+  gap:0;
+  padding:0 clamp(1rem,4vw,4rem) 4rem;
+}
+.mission-rail { min-height:690px;padding:5.5rem 2rem 3rem 0;justify-content:flex-start; }
+[dir=rtl] .mission-rail { padding:5.5rem 0 3rem 2rem; }
+.mission-rail .eyebrow { color:#11131a;font-size:.66rem;font-weight:800; }
+h1,.mission-rail h1 { max-width:9.8ch;font-size:clamp(3.45rem,5.25vw,5.7rem);font-weight:780;line-height:.95; }
+.lede { max-width:42ch;margin:1.7rem 0 1.8rem;color:#3d414b;line-height:1.65; }
+.primary-link { padding:.72rem 1.15rem;min-height:46px;font-size:.76rem; }
+.hero-route-signature { margin-top:1.4rem; }
+.metrics { margin-top:auto; }
+
+.specimen-panel {
+  min-height:690px;
+  overflow:visible;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  isolation:isolate;
+  perspective:1300px;
+  --front-x:0px;
+  --front-y:0px;
+  --back-x:0px;
+  --back-y:0px;
+}
+.specimen-panel::before {
+  inset:8% -3% 8% 0;
+  border:0;
+  border-radius:50%;
+  transform:none;
+  box-shadow:none;
+  background:radial-gradient(circle at 47% 45%,rgba(188,244,255,.72),rgba(218,235,255,.42) 37%,rgba(250,196,237,.23) 59%,transparent 74%);
+  filter:blur(25px);
+}
+.specimen-caption { position:absolute;z-index:8;inset:1.25rem 1.5rem auto; }
+.specimen-caption span:last-child { max-width:25ch; }
+.pastel-orbit { inset:-3% -6% -3% -6%;overflow:visible; }
+.orb { box-shadow:inset -17px -13px 38px rgba(255,255,255,.9),0 30px 65px rgba(91,101,167,.16); }
+.orb-cyan { width:170px;height:170px;inset:58% auto auto 2%; }
+.orb-pink { width:90px;height:90px;inset:23% 27% auto auto;z-index:7; }
+.orb-lilac { width:230px;height:230px;inset:auto -5% -2% auto; }
+.soft-form-one { width:275px;height:150px;inset:6% -1% auto auto;filter:blur(12px);border-radius:45% 55% 53% 47% / 61% 49% 51% 39%; }
+.soft-form-two { width:260px;height:220px;inset:auto auto 0 2%;filter:blur(32px);opacity:.46; }
+
+.route-pass,.robot-sculpture {
+  position:absolute;
+  margin:0;
+  padding:1.25rem;
+  width:38%;
+  height:65%;
+  min-width:220px;
+  border-radius:30px;
+  border:1.5px solid transparent;
+  background:
+    linear-gradient(rgba(255,255,255,.91),rgba(255,255,255,.91)) padding-box,
+    linear-gradient(150deg,#d77cff,#79dfff) border-box;
+  box-shadow:42px 38px 90px rgba(85,96,145,.2),inset 0 0 22px rgba(255,255,255,.9);
+  backdrop-filter:blur(8px);
+  transform-style:preserve-3d;
+  transition:transform 220ms ease;
+}
+.robot-sculpture {
+  z-index:4;
+  inset:11% auto auto 23%;
+  transform:rotate(-12deg) translate3d(var(--front-x),var(--front-y),40px);
+}
+.route-pass--rear {
+  z-index:3;
+  inset:31% 9% auto auto;
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  transform:rotate(15deg) translate3d(var(--back-x),var(--back-y),0);
+}
+.robot-sculpture::before,.route-pass::before {
+  content:"";
+  position:absolute;
+  inset:.7rem;
+  border-radius:22px;
+  opacity:.42;
+  background-image:linear-gradient(#8395c31b 1px,transparent 1px),linear-gradient(90deg,#8395c31b 1px,transparent 1px);
+  background-size:22px 22px;
+  pointer-events:none;
+}
+.robot-sculpture svg { position:absolute;z-index:2;left:-20%;bottom:5%;width:140%;height:auto;max-height:72%;overflow:visible; }
+.robot-sculpture:hover { transform:rotate(-9deg) translateY(-6px); }
+.specimen-index { inset:auto auto 1.25rem 1.25rem;writing-mode:horizontal-tb;color:#767d91; }
+.parcel-token { inset:28% -24% auto auto; }
+.route-pass strong { position:relative;z-index:1;margin-top:.3rem;font-size:1.8rem;letter-spacing:-.05em; }
+.route-pass small,.mockup-kicker { position:relative;z-index:1;color:#676e80;font:.54rem/1.4 var(--mono);letter-spacing:.1em; }
+.mockup-map { position:relative;z-index:1;flex:1;min-height:190px;overflow:hidden;border:1px solid #e4e6ef;border-radius:18px;background:linear-gradient(145deg,rgba(226,249,255,.9),rgba(249,229,246,.75)); }
+.mockup-map::before { content:"";position:absolute;inset:14% 12%;border:2px dashed rgba(91,85,206,.37);border-radius:48% 42% 58% 35%;transform:rotate(-11deg); }
+.mockup-map i { position:absolute;width:12px;height:12px;border:3px solid #fff;border-radius:50%;background:#6e65e8;box-shadow:0 5px 12px rgba(76,70,178,.22); }
+.mockup-map i:nth-child(1){left:16%;top:24%}.mockup-map i:nth-child(2){left:65%;top:15%;background:#ed83ca}.mockup-map i:nth-child(3){left:76%;top:64%;background:#63cfe8}.mockup-map i:nth-child(4){left:28%;top:76%}
+.mockup-stops { position:relative;z-index:1;display:flex;justify-content:space-between;gap:.4rem;color:#3a3f4f;font:.54rem var(--mono); }
+.mockup-stops span { color:#7c72e8; }
+.specimen-footer { position:absolute;z-index:8;inset:auto 1.5rem .5rem 1.5rem;margin:0;padding:.85rem 1rem;border:1px solid rgba(218,221,234,.9);border-radius:999px;background:rgba(255,255,255,.84);box-shadow:0 12px 34px rgba(56,61,92,.09);backdrop-filter:blur(12px); }
+.specimen-footer h2 { font-size:1rem; }
+.specimen-footer p { font-size:.55rem; }
+.specimen-footer button { min-height:42px;padding:.45rem .8rem;font-size:.62rem; }
+
+@media(min-width:761px){
+  [dir=rtl] .command-shell{grid-template-areas:"specimen mission" "evidence topology" "fleet fleet" "analytics analytics"}
+}
+
+@media(max-width:1120px){
+  .topbar{grid-template-columns:auto 1fr}.topbar-status{grid-column:2;grid-row:1;justify-self:end}.topbar .workspace-nav{grid-column:1/-1;grid-row:2;min-height:48px}.topbar{padding-block:.6rem}.command-shell{grid-template-columns:minmax(300px,.8fr) minmax(440px,1.2fr)}.mission-rail,.specimen-panel{min-height:620px}.robot-sculpture,.route-pass{min-width:190px}.robot-sculpture{left:17%}
+}
+@media(max-width:760px){
+  .topbar{display:flex;min-height:auto;flex-wrap:wrap}.topbar .workspace-nav{order:3;width:100%;overflow-x:auto}.topbar-status{margin-inline-start:auto}.session-bar{padding-top:.6rem}.command-shell{display:grid;grid-template-columns:1fr;grid-template-areas:"mission" "specimen" "topology" "evidence" "fleet" "analytics"}.mission-rail{min-height:auto;padding:3rem .4rem}.metrics{margin-top:2rem}.specimen-panel{min-height:590px;margin-bottom:2rem}.robot-sculpture,.route-pass{width:43%;min-width:175px;height:60%}.robot-sculpture{inset:11% auto auto 10%}.route-pass--rear{inset:29% 5% auto auto}.orb-lilac{width:170px;height:170px}.soft-form-one{width:210px}.specimen-caption{inset:.5rem .7rem auto}.specimen-footer{inset:auto .5rem .25rem}
+}
+@media(max-width:430px){
+  .brand strong{font-size:.82rem}.topbar .workspace-nav{gap:1rem}.topbar .workspace-nav a{white-space:nowrap;font-size:.65rem}.simulated-label{display:none}.specimen-panel{min-height:520px}.robot-sculpture,.route-pass{min-width:150px;height:57%;padding:.85rem;border-radius:22px}.robot-sculpture{left:3%}.route-pass--rear{right:1%}.route-pass strong{font-size:1.15rem}.mockup-map{min-height:120px}.orb-cyan{width:110px;height:110px}.orb-lilac{width:140px;height:140px}.parcel-token{width:52px;height:52px}.specimen-footer{border-radius:22px}.specimen-footer button{display:none}
+}
+@media(prefers-reduced-motion:reduce){.robot-sculpture,.route-pass{transform:none!important;transition:none}.orb,.soft-form,.parcel-token{animation:none!important}}

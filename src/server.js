@@ -15,7 +15,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && url.pathname === "/api/health") return json(response, 200, { status: "ok", mode: "simulated", physicalControl: false });
     if (request.method === "GET" && url.pathname === "/api/fleet") {
       return json(response, 200, service.snapshot({
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined,
         search: url.searchParams.get("search") || "",
         status: url.searchParams.get("status") || undefined
@@ -23,7 +23,7 @@ const server = createServer(async (request, response) => {
     }
     if (request.method === "GET" && url.pathname === "/api/analytics/missions") {
       return json(response, 200, service.missionAnalytics({
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       }));
     }
@@ -31,14 +31,14 @@ const server = createServer(async (request, response) => {
       return json(response, 200, {
         simulated: true,
         alerts: service.alerts({
-          organizationId: "org-aljazari-demo",
+          organizationId: "org-parcel-grid-demo",
           clientId: url.searchParams.get("clientId") || undefined
         })
       });
     }
     if (request.method === "GET" && url.pathname === "/api/maintenance") {
       return json(response, 200, service.maintenance({
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       }));
     }
@@ -46,7 +46,7 @@ const server = createServer(async (request, response) => {
       return json(response, 200, {
         simulated: true,
         incidents: service.incidents({
-          organizationId: "org-aljazari-demo",
+          organizationId: "org-parcel-grid-demo",
           clientId: url.searchParams.get("clientId") || undefined
         })
       });
@@ -54,7 +54,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && /^\/api\/incidents\/[^/]+\/replay$/.test(url.pathname)) {
       const incidentId = decodeURIComponent(url.pathname.split("/").at(-2));
       const incident = service.incident(incidentId, {
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       });
       return json(response, incident ? 200 : 404, incident ?? { error: "Incident not found in tenant" });
@@ -62,7 +62,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && /^\/api\/robots\/[^/]+\/diagnostics$/.test(url.pathname)) {
       const robotId = decodeURIComponent(url.pathname.split("/").at(-2));
       const diagnostic = service.diagnostic(robotId, {
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       }, url.searchParams.get("question") || "");
       return json(response, diagnostic ? 200 : 404, diagnostic ?? { error: "Robot not found in tenant" });
@@ -70,7 +70,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && /^\/api\/robots\/[^/]+\/missions$/.test(url.pathname)) {
       const robotId = decodeURIComponent(url.pathname.split("/").at(-2));
       const timeline = service.missionTimeline(robotId, {
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       });
       return json(response, timeline ? 200 : 404, timeline ?? { error: "Robot not found in tenant" });
@@ -78,7 +78,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && /^\/api\/robots\/[^/]+\/telemetry$/.test(url.pathname)) {
       const robotId = decodeURIComponent(url.pathname.split("/").at(-2));
       const history = service.telemetryHistory(robotId, {
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       }, {
         startAt: url.searchParams.get("startAt") || undefined,
@@ -90,7 +90,7 @@ const server = createServer(async (request, response) => {
     }
     if (request.method === "GET" && url.pathname.startsWith("/api/robots/")) {
       const robot = service.robot(decodeURIComponent(url.pathname.split("/").at(-1)), {
-        organizationId: "org-aljazari-demo",
+        organizationId: "org-parcel-grid-demo",
         clientId: url.searchParams.get("clientId") || undefined
       });
       return json(response, robot ? 200 : 404, robot ?? { error: "Robot not found in tenant" });
@@ -101,7 +101,7 @@ const server = createServer(async (request, response) => {
       return json(response, 200, {
         simulated: true,
         alert: service.acknowledgeAlert(alertId, body, {
-          organizationId: "org-aljazari-demo",
+          organizationId: "org-parcel-grid-demo",
           clientId: url.searchParams.get("clientId") || undefined
         })
       });
@@ -111,7 +111,7 @@ const server = createServer(async (request, response) => {
       return json(response, 200, {
         simulated: true,
         ...service.confirmMaintenanceTicket(body.alertId, body, {
-          organizationId: "org-aljazari-demo",
+          organizationId: "org-parcel-grid-demo",
           clientId: url.searchParams.get("clientId") || undefined
         })
       });
@@ -155,6 +155,6 @@ async function readBody(request) {
   return JSON.parse(raw || "{}");
 }
 
-server.listen(port, () => console.log(`AlJazari RobotOps listening on http://localhost:${port}`));
+server.listen(port, () => console.log(`Parcel Grid delivery monitor listening on http://localhost:${port}`));
 
 export { server };
