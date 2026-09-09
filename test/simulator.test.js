@@ -24,22 +24,48 @@ test("fixed seed produces reproducible identities and telemetry", () => {
   const first = new SimulatorAdapter({ seed: 42 });
   const second = new SimulatorAdapter({ seed: 42 });
   assert.deepEqual(first.listRobots(), second.listRobots());
-  assert.deepEqual(first.telemetry("AJR-001"), second.telemetry("AJR-001"));
+  assert.deepEqual(first.telemetry("PDR-001"), second.telemetry("PDR-001"));
 });
 
 test("simulator exposes twenty robots with changing timestamped samples", () => {
   const adapter = new SimulatorAdapter();
   assert.equal(adapter.listRobots().length, 20);
-  const before = adapter.telemetry("AJR-001").at(-1);
+  const before = adapter.telemetry("PDR-001").at(-1);
   adapter.tick();
-  const after = adapter.telemetry("AJR-001").at(-1);
+  const after = adapter.telemetry("PDR-001").at(-1);
   assert.notEqual(before.observedAt, after.observedAt);
   assert.notEqual(before.batteryPercentage, after.batteryPercentage);
 });
 
+test("parcel-delivery fixtures are fictional, tenant scoped and expose route evidence", () => {
+  const adapter = new SimulatorAdapter();
+  const robots = adapter.listRobots();
+  assert.equal(robots.every((robot) => robot.id.startsWith("PDR-") && robot.organizationId === "org-parcel-grid-demo"), true);
+  assert.equal(robots.every((robot) => Number.isFinite(robot.payloadCapacityKg)), true);
+  const active = robots.find((robot) => adapter.telemetry(robot.id).at(-1)?.mission?.parcelId);
+  const mission = adapter.telemetry(active.id).at(-1).mission;
+  assert.match(mission.parcelId, /^PKG-/);
+  assert.match(mission.pickupStop, /^P-/);
+  assert.match(mission.dropoffStop, /^D-/);
+  assert.equal(mission.routeProgress, mission.progress);
+  assert.equal(Number.isFinite(mission.payloadKg), true);
+});
+
+test("shipped identity is generic and keeps explicit simulation and control boundaries", () => {
+  const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  const design = readFileSync(new URL("../docs/DESIGN.md", import.meta.url), "utf8");
+  const shipped = `${html}\n${app}\n${design}`;
+  assert.doesNotMatch(shipped, /al.?jazari|الجزري|baghdad|بغداد|AJR-/i);
+  assert.match(shipped, /Parcel Grid/);
+  assert.match(shipped, /SIMULATED DATA/);
+  assert.match(shipped, /No physical control/);
+  assert.match(design, /unaffiliated with any real company/i);
+});
+
 test("simulator telemetry carries verified source provenance", () => {
   const adapter = new SimulatorAdapter();
-  const sample = adapter.telemetry("AJR-001").at(-1);
+  const sample = adapter.telemetry("PDR-001").at(-1);
   assert.deepEqual(sample.provenance, {
     gatewayId: "telemetry-ingestion-v1",
     sourceId: "simulator-primary",
@@ -226,7 +252,7 @@ test("health score is documented and derived from supported values", () => {
 test("fault injection creates threshold evidence and never enables control", () => {
   const adapter = new SimulatorAdapter();
   const service = new FleetService(adapter);
-  const result = service.injectFault("AJR-002", "wheel-friction");
+  const result = service.injectFault("PDR-002", "wheel-friction");
   assert.equal(result.confirmation.simulated, true);
   assert.equal(adapter.describe().supportsControl, false);
   assert.equal(result.robot.anomalies[0].code, "DRIVETRAIN_CURRENT_HIGH");
@@ -235,17 +261,17 @@ test("fault injection creates threshold evidence and never enables control", () 
 
 test("client tenant filter cannot access another client's robot", () => {
   const service = new FleetService(new SimulatorAdapter());
-  assert.equal(service.robot("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-sindbad" }), null);
-  const fleet = service.snapshot({ organizationId: "org-aljazari-demo", clientId: "client-sindbad" });
+  assert.equal(service.robot("PDR-002", { organizationId: "org-parcel-grid-demo", clientId: "client-northstar" }), null);
+  const fleet = service.snapshot({ organizationId: "org-parcel-grid-demo", clientId: "client-northstar" });
   assert.ok(fleet.robots.length > 0);
-  assert.ok(fleet.robots.every((robot) => robot.clientId === "client-sindbad"));
+  assert.ok(fleet.robots.every((robot) => robot.clientId === "client-northstar"));
   assert.equal(fleet.totals.total, fleet.robots.length);
 });
 
 
 test("alert engine groups repeated evidence and suppresses cooldown duplicates", () => {
   const engine = new AlertEngine({ cooldownMs: 60_000 });
-  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
+  const robot = { id: "PDR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
   const evidence = (observedAt) => [{ code: "DRIVETRAIN_CURRENT_HIGH", severity: "high", metric: "motorCurrent", value: 6.4, threshold: 5.6, baselineMean: 2.6, zScore: 8, observedAt }];
 
   engine.ingest(robot, evidence("2026-09-07T20:00:00.000Z"));
@@ -262,7 +288,7 @@ test("alert engine groups repeated evidence and suppresses cooldown duplicates",
 
 test("alert acknowledgement is explicit, human-attributed and does not trigger control", () => {
   const engine = new AlertEngine();
-  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
+  const robot = { id: "PDR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
   engine.ingest(robot, [{ code: "NETWORK_LATENCY_HIGH", severity: "warning", metric: "networkLatency", value: 520, threshold: 420, baselineMean: 70, zScore: 12, observedAt: "2026-09-07T20:00:00.000Z" }]);
   const [openAlert] = engine.list();
 
@@ -277,11 +303,11 @@ test("alert acknowledgement is explicit, human-attributed and does not trigger c
 
 function acknowledgedAlert(overrides = {}) {
   return {
-    id: "ALT-AJR-002-DRIVETRAIN_CURRENT_HIGH",
+    id: "ALT-PDR-002-DRIVETRAIN_CURRENT_HIGH",
     organizationId: "org-1",
     clientId: "client-1",
     siteId: "site-1",
-    robotId: "AJR-002",
+    robotId: "PDR-002",
     code: "DRIVETRAIN_CURRENT_HIGH",
     severity: "high",
     status: "acknowledged",
@@ -325,7 +351,7 @@ test("maintenance tickets require human confirmation, remain tenant scoped and p
 
 test("incident replay is deterministic and derives its trigger window from telemetry", () => {
   const replay = new IncidentReplay({ windowSize: 4 });
-  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
+  const robot = { id: "PDR-002", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
   const history = [
     { observedAt: "2026-09-07T20:00:00.000Z", batteryPercentage: 80, motorCurrent: 2.5, motorTemperature: 44, localizationQuality: 90, networkLatency: 50, mission: { state: "working" }, position: { x: 1, y: 1, orientation: 0 } },
     { observedAt: "2026-09-07T20:00:30.000Z", batteryPercentage: 79, motorCurrent: 2.7, motorTemperature: 45, localizationQuality: 89, networkLatency: 55, mission: { state: "working" }, position: { x: 2, y: 1, orientation: .2 } },
@@ -346,8 +372,8 @@ test("incident replay is deterministic and derives its trigger window from telem
 
 test("incident replay retains a telemetry timeline when pose is unsupported", () => {
   const replay = new IncidentReplay();
-  const robot = { id: "AJR-003", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
-  const alert = acknowledgedAlert({ id: "ALT-AJR-003-NETWORK_LATENCY_HIGH", robotId: "AJR-003", code: "NETWORK_LATENCY_HIGH", severity: "warning", evidence: { metric: "networkLatency", value: 520, threshold: 420, baselineMean: 60, zScore: 10, observedAt: "2026-09-07T20:00:30.000Z" } });
+  const robot = { id: "PDR-003", organizationId: "org-1", clientId: "client-1", siteId: "site-1" };
+  const alert = acknowledgedAlert({ id: "ALT-PDR-003-NETWORK_LATENCY_HIGH", robotId: "PDR-003", code: "NETWORK_LATENCY_HIGH", severity: "warning", evidence: { metric: "networkLatency", value: 520, threshold: 420, baselineMean: 60, zScore: 10, observedAt: "2026-09-07T20:00:30.000Z" } });
   const history = [
     { observedAt: "2026-09-07T20:00:00.000Z", batteryPercentage: 80, motorCurrent: null, motorTemperature: null, localizationQuality: null, networkLatency: 60, mission: null, position: null },
     { observedAt: "2026-09-07T20:00:30.000Z", batteryPercentage: 79, motorCurrent: null, motorTemperature: null, localizationQuality: null, networkLatency: 520, mission: null, position: null }
@@ -361,11 +387,11 @@ test("incident replay retains a telemetry timeline when pose is unsupported", ()
 
 test("fleet incident queries enforce tenant scope", () => {
   const service = new FleetService(new SimulatorAdapter());
-  service.injectFault("AJR-002", "wheel-friction");
-  const visible = service.incidents({ organizationId: "org-aljazari-demo", clientId: "client-rashid" });
-  const hidden = service.incidents({ organizationId: "org-aljazari-demo", clientId: "client-sindbad" });
-  assert.equal(visible.some((incident) => incident.robotId === "AJR-002"), true);
-  assert.equal(hidden.some((incident) => incident.robotId === "AJR-002"), false);
+  service.injectFault("PDR-002", "wheel-friction");
+  const visible = service.incidents({ organizationId: "org-parcel-grid-demo", clientId: "client-bluebird" });
+  const hidden = service.incidents({ organizationId: "org-parcel-grid-demo", clientId: "client-northstar" });
+  assert.equal(visible.some((incident) => incident.robotId === "PDR-002"), true);
+  assert.equal(hidden.some((incident) => incident.robotId === "PDR-002"), false);
 });
 
 
@@ -389,7 +415,7 @@ function diagnosticHistory(latest = {}) {
 
 test("diagnostic copilot is deterministic and grounds a working hypothesis in threshold evidence", () => {
   const copilot = new DiagnosticCopilot();
-  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1" };
+  const robot = { id: "PDR-002", organizationId: "org-1", clientId: "client-1" };
   const input = { robot, history: diagnosticHistory({ networkLatency: 520 }), question: "Why did it pause?" };
   const first = copilot.analyze(input);
   const second = copilot.analyze(input);
@@ -407,7 +433,7 @@ test("diagnostic copilot is deterministic and grounds a working hypothesis in th
 test("diagnostic copilot reports insufficient evidence instead of inventing a cause", () => {
   const copilot = new DiagnosticCopilot();
   const result = copilot.analyze({
-    robot: { id: "AJR-001", organizationId: "org-1", clientId: "client-1" },
+    robot: { id: "PDR-001", organizationId: "org-1", clientId: "client-1" },
     history: diagnosticHistory()
   });
   assert.equal(result.status, "insufficient-evidence");
@@ -419,9 +445,9 @@ test("diagnostic copilot reports insufficient evidence instead of inventing a ca
 
 test("fleet diagnostic queries enforce tenant scope and preserve control separation", () => {
   const service = new FleetService(new SimulatorAdapter());
-  assert.equal(service.diagnostic("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-sindbad" }), null);
-  const visible = service.diagnostic("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-rashid" }, "Summarize evidence");
-  assert.equal(visible.clientId, "client-rashid");
+  assert.equal(service.diagnostic("PDR-002", { organizationId: "org-parcel-grid-demo", clientId: "client-northstar" }), null);
+  const visible = service.diagnostic("PDR-002", { organizationId: "org-parcel-grid-demo", clientId: "client-bluebird" }, "Summarize evidence");
+  assert.equal(visible.clientId, "client-bluebird");
   assert.equal(visible.decisionSupportOnly, true);
   assert.equal(visible.physicalControl, false);
 });
@@ -437,7 +463,7 @@ test("diagnostic UI consumes evidence, alternatives and safety fields through th
 
 test("mission timeline derives lifecycle duration and distance from recorded transitions", () => {
   const timeline = new MissionTimeline();
-  const robot = { id: "AJR-002", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
+  const robot = { id: "PDR-002", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
   const history = [
     { observedAt: "2026-09-07T20:00:00.000Z", mission: { id: null, state: "idle", progress: 0, distanceMeters: 0 } },
     { observedAt: "2026-09-07T20:00:30.000Z", mission: { id: "MS-1", state: "working", progress: 0, distanceMeters: 0 } },
@@ -457,21 +483,21 @@ test("mission timeline derives lifecycle duration and distance from recorded tra
 
 test("mission timeline preserves a reported terminal reason without inventing a missing start", () => {
   const timeline = new MissionTimeline();
-  const robot = { id: "AJR-004", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
+  const robot = { id: "PDR-004", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
   const result = timeline.build(robot, [{
     observedAt: "2026-09-07T20:05:00.000Z",
-    mission: { id: "MS-TRUNCATED", state: "failed", progress: 61, distanceMeters: 17.5, reasonCode: "NAVIGATION_BLOCKED" }
+    mission: { id: "MS-TRUNCATED", state: "failed", progress: 61, distanceMeters: 17.5, reasonCode: "DELIVERY_ROUTE_BLOCKED" }
   }]);
   assert.equal(result.missions[0].startedAt, null);
   assert.equal(result.missions[0].durationSeconds, null);
-  assert.equal(result.missions[0].reasonCode, "NAVIGATION_BLOCKED");
+  assert.equal(result.missions[0].reasonCode, "DELIVERY_ROUTE_BLOCKED");
   assert.equal(result.missions[0].incompleteEvidence, true);
   assert.equal(result.events[0].kind, "first-observed");
 });
 
 test("mission timeline does not turn a later sample into a missing start transition", () => {
   const timeline = new MissionTimeline();
-  const robot = { id: "AJR-005", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
+  const robot = { id: "PDR-005", organizationId: "org-1", clientId: "client-1", capabilities: { missions: true } };
   const result = timeline.build(robot, [
     { observedAt: "2026-09-07T20:00:00.000Z", mission: { id: "MS-MID", state: "working", progress: 35, distanceMeters: 5 } },
     { observedAt: "2026-09-07T20:00:30.000Z", mission: { id: "MS-MID", state: "working", progress: 45, distanceMeters: 7 } },
@@ -484,7 +510,7 @@ test("mission timeline does not turn a later sample into a missing start transit
 });
 
 test("mission timeline reports unsupported capability explicitly", () => {
-  const result = new MissionTimeline().build({ id: "AJR-003", organizationId: "org-1", clientId: "client-1", capabilities: { missions: false } }, []);
+  const result = new MissionTimeline().build({ id: "PDR-003", organizationId: "org-1", clientId: "client-1", capabilities: { missions: false } }, []);
   assert.equal(result.supported, false);
   assert.equal(result.missions.length, 0);
   assert.match(result.capabilityNotice, /unsupported/);
@@ -505,9 +531,9 @@ test("deterministic simulator emits explicit mission outcomes only for capable r
 
 test("fleet mission timeline queries enforce tenant scope", () => {
   const service = new FleetService(new SimulatorAdapter());
-  assert.equal(service.missionTimeline("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-sindbad" }), null);
-  const visible = service.missionTimeline("AJR-002", { organizationId: "org-aljazari-demo", clientId: "client-rashid" });
-  assert.equal(visible.clientId, "client-rashid");
+  assert.equal(service.missionTimeline("PDR-002", { organizationId: "org-parcel-grid-demo", clientId: "client-northstar" }), null);
+  const visible = service.missionTimeline("PDR-002", { organizationId: "org-parcel-grid-demo", clientId: "client-bluebird" });
+  assert.equal(visible.clientId, "client-bluebird");
   assert.equal(visible.simulated, true);
   assert.equal(visible.physicalControl, false);
 });
@@ -569,12 +595,12 @@ test("mission analytics returns unavailable rates instead of zero for empty deno
 
 test("fleet mission analytics stays inside the requested tenant", () => {
   const service = new FleetService(new SimulatorAdapter());
-  const tenant = service.missionAnalytics({ organizationId: "org-aljazari-demo", clientId: "client-rashid" });
+  const tenant = service.missionAnalytics({ organizationId: "org-parcel-grid-demo", clientId: "client-bluebird" });
   assert.equal(tenant.coverage.totalRobots, 7);
   assert.equal(tenant.coverage.missionCapableRobots, 7);
   assert.equal(tenant.observationWindow.telemetrySampleCount, 42);
   assert.equal(tenant.formulaVersion, "mission-analytics-v1");
-  assert.deepEqual(tenant.scope, { organizationId: "org-aljazari-demo", clientId: "client-rashid" });
+  assert.deepEqual(tenant.scope, { organizationId: "org-parcel-grid-demo", clientId: "client-bluebird" });
   assert.equal(tenant.readOnly, true);
 });
 
@@ -654,17 +680,17 @@ test("fleet telemetry history uses the repository boundary and remains tenant sc
   const adapter = new SimulatorAdapter();
   adapter.telemetry = () => { throw new Error("legacy adapter telemetry must not be read"); };
   const service = new FleetService(adapter);
-  const hidden = service.telemetryHistory("AJR-002", {
-    organizationId: "org-aljazari-demo",
-    clientId: "client-sindbad"
+  const hidden = service.telemetryHistory("PDR-002", {
+    organizationId: "org-parcel-grid-demo",
+    clientId: "client-northstar"
   }, { limit: 2 });
   assert.equal(hidden, null);
-  const visible = service.telemetryHistory("AJR-002", {
-    organizationId: "org-aljazari-demo",
-    clientId: "client-rashid"
+  const visible = service.telemetryHistory("PDR-002", {
+    organizationId: "org-parcel-grid-demo",
+    clientId: "client-bluebird"
   }, { limit: 2 });
   assert.equal(visible.samples.length, 2);
-  assert.equal(visible.scope.clientId, "client-rashid");
+  assert.equal(visible.scope.clientId, "client-bluebird");
   assert.equal(visible.source.repositoryId, "deterministic-in-memory-telemetry");
   assert.equal(visible.simulated, true);
   assert.equal(visible.readOnly, true);

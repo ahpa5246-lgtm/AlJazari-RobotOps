@@ -1,8 +1,8 @@
-# AlJazari RobotOps
+# Parcel Grid Delivery Monitor
 
-Vendor-agnostic robot fleet intelligence, diagnostics and predictive-maintenance foundation for an independent AlJazari Robotics proposal.
+Vendor-agnostic monitoring for a completely fictional parcel-delivery robot network. Parcel Grid is an original demo name and does not represent, imitate, or imply endorsement by any real company.
 
-This first vertical slice is real software backed by a deterministic in-memory simulator—not a hardcoded dashboard. Twenty fictional robots expose optional capabilities and changing timestamped telemetry through a universal service boundary. Derived fleet totals, a documented health heuristic and explainable threshold evidence feed an Arabic/English command center.
+This vertical slice is real software backed by a deterministic in-memory simulator—not a hardcoded dashboard. Twenty fictional delivery units expose optional capabilities, payload capacity, parcel runs, pickup/drop-off stops, route progress and changing timestamped telemetry through a universal service boundary. Derived fleet totals, a documented health heuristic and explainable threshold evidence feed an Arabic/English monitoring workspace.
 
 > **SIMULATED DATA:** all robots, clients, sites, telemetry, faults and recommendations in this repository are fictional. The prototype cannot control a physical robot and makes no validated predictive-accuracy claim.
 
@@ -33,7 +33,7 @@ Open `http://localhost:3000`.
 - `GET /api/incidents/:id/replay?clientId=`
 - `GET /api/maintenance?clientId=`
 - `POST /api/maintenance/tickets` with `{ "alertId": "ALT-...", "actor": "demo-technician", "confirmed": true }`
-- `POST /api/simulator/faults` with `{ "robotId": "AJR-002", "fault": "wheel-friction", "confirmed": true }`
+- `POST /api/simulator/faults` with `{ "robotId": "PDR-002", "fault": "wheel-friction", "confirmed": true }`
 
 Incident replay endpoints reconstruct a bounded, read-only evidence window from recorded simulator samples. Missing position capability is reported explicitly; no path is interpolated and no causal conclusion is generated.
 
@@ -53,11 +53,11 @@ All POST endpoints mutate in-memory demo state only and cannot issue physical co
 
 ## Verification
 
-`npm run verify` performs JavaScript syntax checks, 46 deterministic domain/presentation-contract tests and a reproducible production artifact build. GitHub Actions runs the same command. The `typecheck` and `lint` names currently map to syntax validation, not TypeScript or a semantic linter.
+`npm run verify` performs JavaScript syntax checks, 48 deterministic domain/presentation-contract tests and a reproducible production artifact build. GitHub Actions runs the same command. The `typecheck` and `lint` names currently map to syntax validation, not TypeScript or a semantic linter.
 
-## White and violet operations studio
+## Field-ledger delivery workspace
 
-The redesigned interface adds a tenant-aware site atlas, an illustrated robot specimen, two-robot measurement comparison, component-level health explanation and pause/manual-refresh controls. Registry filters affect the atlas and summary; the mission ledger clearly identifies its full-fleet scope. Unsupported signals remain unavailable. The specimen is an illustration, not a model of real hardware.
+The interface uses a warm paper, route-blue and safety-amber visual system. It adds a tenant-aware delivery-zone atlas, an illustrated parcel carrier, visible parcel/route evidence, two-unit measurement comparison, component-level health explanation and pause/manual-refresh controls. Registry filters affect the atlas and summary; the parcel ledger clearly identifies its full-fleet scope. Unsupported signals remain unavailable. The specimen is an illustration, not a model of real hardware.
 
 See [the design contract](docs/DESIGN.md) for catalog choices, token contrast, responsive/RTL and reduced-motion behavior, transfer budget, and the open browser-review checklist. Browser visual acceptance is pending because the review environment denied the local preview; passing domain tests does not establish visual quality.
 

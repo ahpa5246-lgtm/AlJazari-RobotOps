@@ -1,34 +1,35 @@
-# AlJazari — porcelain and violet operations studio
+# Parcel Grid — field-ledger delivery workspace
 
 Status: implementation delivered for review; browser visual acceptance remains open.
 
 ## Visual thesis
 
-A white robotics studio with a sculptural violet specimen, a site atlas and a clear evidence desk. The owner explicitly replaced the previous dark mineral-green direction with white and shades of purple on 2026-09-08. The supplied moodboards inform depth, shape rhythm and hierarchy, not copied layout or artwork.
+A bright logistics field ledger where every parcel is a traceable evidence token moving through pickup, route and drop-off. Warm paper surfaces, route blue, safety amber, clipped labels and a parcel-bearing illustrated unit replace the former company-specific presentation identity without changing the proven monitoring structure.
 
 Principles:
-- A quiet white canvas makes robot identity and measured evidence the focal points.
-- One original inline SVG specimen establishes character; it is explicitly illustrative, never device geometry.
-- The atlas groups real simulator identities by organization, client and site. It is not a spatial digital twin.
+- Warm paper surfaces make parcel progress and measured evidence the focal points.
+- One original inline SVG parcel carrier establishes character; it is explicitly illustrative, never device geometry.
+- The atlas groups fictional simulator identities by tenant and delivery zone. It is not a live map or spatial digital twin.
 - A broad registry, compact evidence desk and full-width mission ledger have different information densities.
 - Every operation has a semantic control; the visual treatment supports inspection instead of replacing it.
 
-Anti-goals: copied brand trade dress, green console styling, neon glow, fake graphs or rankings, decorative telemetry, scroll hijacking, continuous ambient animation, overlapping rendering libraries.
+Anti-goals: real-company affiliation, copied trade dress, generic admin-card wallpaper, neon glow, fake maps or rankings, decorative telemetry, scroll hijacking, continuous ambient animation, overlapping rendering libraries.
 
 ## Tokens and typography
 
 | Role | Token |
 |---|---|
-| Canvas / surface | #faf9fd / #ffffff |
-| Lilac surface | #f0eaf8 |
-| Primary ink / secondary ink | #291b3d / #6b6079 |
-| Brand violet / focus | #69419b / #54239b |
-| Borders | #ded5e9 |
-| Warning / critical | #885214 / #a82c53 |
+| Canvas / surface | #f7f4ec / #fffdf8 |
+| Ledger surface | #f0eadc |
+| Primary ink / secondary ink | #152b3b / #5e6970 |
+| Route blue / focus | #176b9b / #005fcc |
+| Safety amber | #f2a71b |
+| Borders | #d8d1c2 |
+| Warning / critical | #9a5b00 / #aa2d3b |
 
-System sans-serif typography uses Segoe UI, Tahoma and Arial with no remote fonts. Monospace is reserved for technical identifiers. Shapes combine an asymmetric specimen frame, raised site islands and quieter data regions. Status always includes text; color alone is insufficient.
+System sans-serif typography uses Segoe UI, Tahoma and Arial with no remote fonts. Monospace is reserved for parcel and unit identifiers. Clipped label corners and route-colored island edges echo sorting labels without imitating a courier brand. Status always includes text; color alone is insufficient.
 
-Calculated text contrast: primary ink on canvas 15.19:1; secondary ink on lilac 4.99:1; violet on white 7.42:1; warning on white 6.43:1; critical on white 6.67:1. These token calculations are not a complete browser accessibility audit.
+Token choices target WCAG AA text contrast and retain a separate visible blue focus outline. Exact contrast and browser-layout checks remain part of the visual acceptance gate; token intent is not presented as a complete accessibility audit.
 
 ## Catalog decisions
 
@@ -56,7 +57,7 @@ The wider catalog is a selection resource, not eighty dependencies. Zero package
 
 Native buttons, labelled search/filter controls, semantic sections and a native modal dialog form the interaction foundation. Focus moves to dialog headings and is preserved for regenerated registry/atlas controls. The document section order matches the visual reading order. Status changes are announced without announcing every telemetry timestamp.
 
-Layouts adapt at 1120, 760 and 370 pixels with one-column site groups and stacked detail regions. Logical properties support RTL. Minimum action size is 44 pixels; visible focus uses a high-contrast violet outline. Reduced motion removes transform feedback, transitions and smooth scrolling. No WebGL is needed. Print output suppresses decoration and controls.
+Layouts adapt at 1120, 760 and 370 pixels with one-column delivery zones and stacked detail regions. Logical properties support RTL. Minimum action size is 44 pixels; visible focus uses a high-contrast blue outline. Reduced motion removes transform feedback, transitions and smooth scrolling. No WebGL is needed. Print output suppresses decoration and controls.
 
 ## Evidence and remaining acceptance gate
 
@@ -72,6 +73,6 @@ Required visual review on an authorized local preview: English and Arabic at 144
 
 ## Scope and rollback
 
-This redesign improves the simulated operations experience. Production authentication, persistent deployment storage, live hardware, physical control and real-world validation remain outside this change. SIMULATED DATA remains explicit and health/diagnostics remain documented heuristics.
+This redesign changes identity and parcel-delivery context while preserving the simulated monitoring architecture. Parcel Grid is fictional and unaffiliated with any real company. Production authentication, persistent deployment storage, live hardware, physical control and real-world validation remain outside this change. SIMULATED DATA remains explicit and health/diagnostics remain documented heuristics.
 
 Rollback by reverting this feature commit after review. No backend schema, API contract, dependency lockfile, deployment or data migration changed.

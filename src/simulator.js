@@ -2,15 +2,15 @@ import { InMemoryTelemetryRepository, assertTelemetryRepository } from "./teleme
 import { TelemetryIngestionGateway } from "./telemetry-ingestion.js";
 
 const CLIENTS = [
-  { id: "client-sindbad", name: "Sindbad Restaurant Group", site: { id: "site-karrada", name: "Karrada Flagship" } },
-  { id: "client-rashid", name: "Al-Rashid Hotel", site: { id: "site-lobby", name: "Main Lobby" } },
-  { id: "client-tech", name: "Baghdad Tech Campus", site: { id: "site-lab", name: "Robotics Lab" } }
+  { id: "client-northstar", name: "Northstar Market", site: { id: "site-river", name: "River District Hub" } },
+  { id: "client-bluebird", name: "Bluebird Pharmacy Demo", site: { id: "site-harbor", name: "Harbor Pickup Zone" } },
+  { id: "client-evergreen", name: "Evergreen Grocer", site: { id: "site-garden", name: "Garden Loop Depot" } }
 ];
 
 const MODELS = [
-  { manufacturer: "Pudu", model: "BellaBot", capabilities: { battery: true, pose: true, missions: true, motors: false, sensors: true, network: true } },
-  { manufacturer: "Generic ROS 2", model: "Courier-X", capabilities: { battery: true, pose: true, missions: true, motors: true, sensors: true, network: true } },
-  { manufacturer: "Closed Vendor", model: "Service-Mini", capabilities: { battery: true, pose: false, missions: false, motors: false, sensors: false, network: true } }
+  { manufacturer: "Fictional Open Fleet", model: "Parcel-25", payloadCapacityKg: 25, capabilities: { battery: true, pose: true, missions: true, motors: false, sensors: true, network: true } },
+  { manufacturer: "Generic ROS 2", model: "Courier-X", payloadCapacityKg: 40, capabilities: { battery: true, pose: true, missions: true, motors: true, sensors: true, network: true } },
+  { manufacturer: "Fictional Adapter", model: "Drop-Mini", payloadCapacityKg: 12, capabilities: { battery: true, pose: false, missions: false, motors: false, sensors: false, network: true } }
 ];
 
 export class SimulatorAdapter {
@@ -95,14 +95,15 @@ export class SimulatorAdapter {
     const model = MODELS[index % MODELS.length];
     const client = CLIENTS[index % CLIENTS.length];
     return {
-      id: `AJR-${String(index + 1).padStart(3, "0")}`,
-      organizationId: "org-aljazari-demo",
+      id: `PDR-${String(index + 1).padStart(3, "0")}`,
+      organizationId: "org-parcel-grid-demo",
       clientId: client.id,
       clientName: client.name,
       siteId: client.site.id,
       siteName: client.site.name,
       manufacturer: model.manufacturer,
       model: model.model,
+      payloadCapacityKg: model.payloadCapacityKg,
       serialNumber: `SIM-${this.seed}-${String(index + 1).padStart(3, "0")}`,
       firmwareVersion: `demo-${1 + index % 3}.${index % 10}`,
       connectionStatus: "online",
@@ -134,21 +135,27 @@ function missionAt(tickNumber, robotIndex) {
   const absolute = tickNumber + robotIndex * 5;
   const cycle = Math.floor(absolute / 24);
   const phase = absolute % 24;
-  if (phase < 3 || phase > 18) return { id: null, state: "idle", progress: 0, distanceMeters: 0, reasonCode: null };
+  if (phase < 3 || phase > 18) return { id: null, parcelId: null, state: "idle", stage: "awaiting-pickup", progress: 0, routeProgress: 0, payloadKg: 0, pickupStop: null, dropoffStop: null, distanceMeters: 0, reasonCode: null };
 
   const id = `MS-${String(robotIndex + 1).padStart(3, "0")}-${String(cycle + 1).padStart(3, "0")}`;
   const workingProgress = Math.min(94, Math.round((phase - 3) / 15 * 94));
   if (phase < 18) {
-    return { id, state: "working", progress: workingProgress, distanceMeters: round(workingProgress * (0.36 + robotIndex % 4 * 0.04)), reasonCode: null };
+    return { id, parcelId: `PKG-${String(robotIndex + 41).padStart(4, "0")}`, state: "working", stage: workingProgress < 20 ? "pickup" : workingProgress < 88 ? "en-route" : "drop-off", progress: workingProgress, routeProgress: workingProgress, payloadKg: round(2.4 + robotIndex % 5 * 1.3), pickupStop: `P-${1 + robotIndex % 7}`, dropoffStop: `D-${8 + robotIndex % 9}`, distanceMeters: round(workingProgress * (0.36 + robotIndex % 4 * 0.04)), reasonCode: null };
   }
 
   const selector = (robotIndex + cycle) % 10;
   const state = selector === 0 ? "failed" : selector === 1 ? "cancelled" : "completed";
   return {
     id,
+    parcelId: `PKG-${String(robotIndex + 41).padStart(4, "0")}`,
     state,
+    stage: state === "completed" ? "delivered" : "delivery-exception",
     progress: state === "completed" ? 100 : workingProgress,
+    routeProgress: state === "completed" ? 100 : workingProgress,
+    payloadKg: round(2.4 + robotIndex % 5 * 1.3),
+    pickupStop: `P-${1 + robotIndex % 7}`,
+    dropoffStop: `D-${8 + robotIndex % 9}`,
     distanceMeters: round((state === "completed" ? 100 : workingProgress) * (0.36 + robotIndex % 4 * 0.04)),
-    reasonCode: state === "failed" ? "NAVIGATION_BLOCKED" : state === "cancelled" ? "DEMO_OPERATOR_CANCELLED" : null
+    reasonCode: state === "failed" ? "DELIVERY_ROUTE_BLOCKED" : state === "cancelled" ? "DEMO_OPERATOR_CANCELLED" : null
   };
 }

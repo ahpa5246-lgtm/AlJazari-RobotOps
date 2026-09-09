@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#faf9fd">
-    <title>AlJazari RobotOps — Fleet Command</title>
+    <meta name="theme-color" content="#f7f4ec">
+    <title>Parcel Grid — Delivery Fleet Monitor</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/studio.css">
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to fleet command</a>
     <header class="topbar">
-      <div class="brand" aria-label="AlJazari RobotOps">
-        <span class="brand-mark" aria-hidden="true">AJ</span>
-        <span><strong>ALJAZARI</strong><small data-i18n="product">ROBOT OPERATIONS INTELLIGENCE</small></span>
+      <div class="brand" aria-label="Parcel Grid delivery fleet monitor">
+        <span class="brand-mark" aria-hidden="true">PG</span>
+        <span><strong>PARCEL GRID</strong><small data-i18n="product">DELIVERY FLEET INTELLIGENCE</small></span>
       </div>
       <div class="topbar-status">
         <span class="simulated-label">SIMULATED DATA</span>
@@ -29,40 +29,42 @@
     <div class="session-bar"><span data-i18n="sessionTitle">THE OPERATIONS STUDIO</span><div><button id="refresh-mode" type="button" aria-pressed="false">Pause updates</button><button id="refresh-now" type="button">Refresh</button><span id="connection-state" role="status"></span></div></div>
     <main id="main" class="command-shell" tabindex="-1">
       <section class="mission-rail" aria-labelledby="mission-title">
-        <p class="eyebrow" data-i18n="liveOperations">LIVE OPERATIONS / BAGHDAD</p>
-        <h1 id="mission-title" data-i18n="title">Many robots. One perspective.</h1>
-        <p class="lede" data-i18n="lede">Twenty virtual robots report through one capability-aware interface. Unsupported signals stay visibly unsupported.</p>
+        <p class="eyebrow" data-i18n="liveOperations">SIMULATED DELIVERY NETWORK / MONITORING</p>
+        <h1 id="mission-title" data-i18n="title">Every parcel has a path.</h1>
+        <p class="lede" data-i18n="lede">Follow pickup, route and drop-off evidence across a fictional fleet of parcel-delivery robots. Unsupported signals remain visibly unavailable.</p>
         <a class="primary-link" href="#fleet-title"><span data-i18n="explore">Explore the fleet</span><span aria-hidden="true">↗</span></a>
         <div id="metrics" class="metrics" aria-label="Fleet summary"></div>
       </section>
 
       <section class="specimen-panel" aria-labelledby="specimen-title">
-        <div class="specimen-caption"><span data-i18n="specimen">ROBOT STUDY / 01</span><span data-i18n="illustration">Illustrative model · not hardware geometry</span></div>
+        <div class="specimen-caption"><span data-i18n="specimen">DELIVERY UNIT / 01</span><span data-i18n="illustration">Illustrative parcel carrier · not hardware geometry</span></div>
         <div class="robot-sculpture" aria-hidden="true">
           <svg viewBox="0 0 560 400" role="presentation">
             <defs>
-              <linearGradient id="shell" x1="0" x2="1" y2=".7"><stop stop-color="#fff"/><stop offset=".55" stop-color="#eee9f7"/><stop offset="1" stop-color="#bdb0d6"/></linearGradient>
-              <linearGradient id="visor" x2="0" y2="1"><stop stop-color="#4f367b"/><stop offset="1" stop-color="#211434"/></linearGradient>
-              <linearGradient id="pedestal" x2="0" y2="1"><stop stop-color="#e8e1f4"/><stop offset="1" stop-color="#baaad6"/></linearGradient>
+              <linearGradient id="shell" x1="0" x2="1" y2=".7"><stop stop-color="#fff"/><stop offset=".55" stop-color="#f4eee1"/><stop offset="1" stop-color="#e2cfaa"/></linearGradient>
+              <linearGradient id="visor" x2="0" y2="1"><stop stop-color="#17497a"/><stop offset="1" stop-color="#102b46"/></linearGradient>
+              <linearGradient id="pedestal" x2="0" y2="1"><stop stop-color="#f7d58e"/><stop offset="1" stop-color="#e2a434"/></linearGradient>
             </defs>
-            <g fill="none" stroke="#cfc2e4"><ellipse cx="280" cy="330" rx="205" ry="54"/><ellipse cx="280" cy="330" rx="240" ry="70" stroke-dasharray="3 9"/><path d="M40 330h480M280 260v140"/></g>
-            <path d="M147 305v30c0 44 266 44 266 0v-30" fill="url(#pedestal)"/><ellipse cx="280" cy="305" rx="133" ry="37" fill="#f9f7fd" stroke="#c5b8db"/>
-            <ellipse cx="288" cy="304" rx="73" ry="15" fill="#4a286f" opacity=".14"/>
+            <g fill="none" stroke="#c8d1d4"><ellipse cx="280" cy="330" rx="205" ry="54"/><ellipse cx="280" cy="330" rx="240" ry="70" stroke-dasharray="3 9"/><path d="M40 330h480M280 260v140"/></g>
+            <path d="M147 305v30c0 44 266 44 266 0v-30" fill="url(#pedestal)"/><ellipse cx="280" cy="305" rx="133" ry="37" fill="#fffdf8" stroke="#c9b98f"/>
+            <ellipse cx="288" cy="304" rx="73" ry="15" fill="#274b60" opacity=".14"/>
             <g class="robot-body">
-              <rect x="221" y="272" width="22" height="38" rx="9" fill="#30243c"/><rect x="317" y="272" width="22" height="38" rx="9" fill="#30243c"/>
-              <path d="M232 171Q280 147 328 171l17 100q-6 31-65 32t-65-32Z" fill="url(#shell)" stroke="#c4b7d8"/>
-              <path d="M227 190q52 18 106 0M222 244q56 22 116 0" fill="none" stroke="#d4cadd"/>
-              <rect x="260" y="224" width="40" height="5" rx="2.5" fill="#7851b0"/>
-              <path d="M224 181q-25-5-30 16l-9 43q-1 20 17 20l17-8" fill="url(#shell)" stroke="#c4b7d8"/>
-              <path d="M334 181q25-5 30 16l9 43q1 20-17 20l-17-8" fill="url(#shell)" stroke="#c4b7d8"/>
-              <rect x="260" y="151" width="40" height="21" rx="8" fill="#a99bbd"/>
-              <path d="M208 91q1-39 70-42t75 43l-2 47q-2 30-72 31t-72-31Z" fill="url(#shell)" stroke="#c4b7d8"/>
+              <rect x="221" y="272" width="22" height="38" rx="9" fill="#273944"/><rect x="317" y="272" width="22" height="38" rx="9" fill="#273944"/>
+              <path d="M232 171Q280 147 328 171l17 100q-6 31-65 32t-65-32Z" fill="url(#shell)" stroke="#c9b98f"/>
+              <path d="M227 190q52 18 106 0M222 244q56 22 116 0" fill="none" stroke="#d8cdb7"/>
+              <rect x="260" y="224" width="40" height="5" rx="2.5" fill="#f2a71b"/>
+              <path d="M224 181q-25-5-30 16l-9 43q-1 20 17 20l17-8" fill="url(#shell)" stroke="#c9b98f"/>
+              <path d="M334 181q25-5 30 16l9 43q1 20-17 20l-17-8" fill="url(#shell)" stroke="#c9b98f"/>
+              <rect x="260" y="151" width="40" height="21" rx="8" fill="#8aa6b6"/>
+              <path d="M208 91q1-39 70-42t75 43l-2 47q-2 30-72 31t-72-31Z" fill="url(#shell)" stroke="#c9b98f"/>
               <rect x="219" y="86" width="121" height="55" rx="24" fill="url(#visor)"/>
-              <g class="robot-eyes" fill="#e3ceff"><rect x="246" y="103" width="12" height="20" rx="6"/><rect x="303" y="103" width="12" height="20" rx="6"/></g>
-              <path d="M277 44V27" stroke="#78628e" stroke-width="5"/><circle cx="277" cy="23" r="7" fill="#8457b5"/>
+              <g class="robot-eyes" fill="#ffe3a3"><rect x="246" y="103" width="12" height="20" rx="6"/><rect x="303" y="103" width="12" height="20" rx="6"/></g>
+              <path d="M277 44V27" stroke="#3978a8" stroke-width="5"/><circle cx="277" cy="23" r="7" fill="#f2a71b"/>
+              <rect x="242" y="176" width="76" height="50" rx="7" fill="#f2b544" stroke="#b67408"/>
+              <path d="M242 192h76M280 176v50" stroke="#fff2cf"/>
             </g>
-            <g fill="none" stroke="#9c81bd"><path d="M335 99h84v-23h30"/><circle cx="335" cy="99" r="3" fill="#7956a5"/><path d="M221 226H137v20H98"/><circle cx="221" cy="226" r="3" fill="#7956a5"/></g>
-          </svg><span class="specimen-index">AJ / R</span>
+            <g fill="none" stroke="#3978a8"><path d="M335 99h84v-23h30"/><circle cx="335" cy="99" r="3" fill="#f2a71b"/><path d="M221 226H137v20H98"/><circle cx="221" cy="226" r="3" fill="#f2a71b"/></g>
+          </svg><span class="specimen-index">PG / D</span>
         </div>
         <div class="specimen-footer"><div><p class="eyebrow" data-i18n="selectedRobot">SELECTED ROBOT</p><h2 id="specimen-title">—</h2><p id="specimen-subtitle"></p></div><button id="inspect-selected" type="button" disabled data-i18n="openPassport">Open passport ↗</button></div>
       </section>
@@ -109,7 +111,7 @@
 
     </main>
 
-    <footer class="studio-footer"><strong>ALJAZARI / RobotOps</strong><span data-i18n="footerSafety">Independent prototype · SIMULATED DATA · No physical control</span></footer>
+    <footer class="studio-footer"><strong>PARCEL GRID / Delivery Monitor</strong><span data-i18n="footerSafety">Independent fictional prototype · SIMULATED DATA · No physical control</span></footer>
     <dialog id="robot-dialog" aria-label="Robot evidence">
       <button class="dialog-close" type="button" aria-label="Close">×</button>
       <p id="action-error" role="alert" hidden></p>

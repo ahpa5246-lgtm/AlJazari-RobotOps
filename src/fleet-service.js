@@ -68,7 +68,7 @@ export class FleetService {
 
   injectFault(robotId, fault) {
     const confirmation = this.adapter.injectFault(robotId, fault);
-    return { confirmation, robot: this.robot(robotId, { organizationId: "org-aljazari-demo" }) };
+    return { confirmation, robot: this.robot(robotId, { organizationId: "org-parcel-grid-demo" }) };
   }
 
   alerts(tenant = {}) {
