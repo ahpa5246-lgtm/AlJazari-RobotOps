@@ -369,6 +369,24 @@ document.querySelector('#fleet').addEventListener('click', event => {
 });
 document.querySelector('#compare').addEventListener('click', openComparison);
 document.querySelector('#clear-comparison').addEventListener('click', () => { comparisonIds = []; updateComparison(); });
+const heroStage = document.querySelector('.specimen-panel');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const finePointer = window.matchMedia('(pointer: fine)');
+if (heroStage && finePointer.matches) {
+  heroStage.addEventListener('pointermove', event => {
+    if (reducedMotion.matches) return;
+    const bounds = heroStage.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - .5;
+    const y = (event.clientY - bounds.top) / bounds.height - .5;
+    heroStage.style.setProperty('--front-x', `${(-x * 12).toFixed(2)}px`);
+    heroStage.style.setProperty('--front-y', `${(-y * 12).toFixed(2)}px`);
+    heroStage.style.setProperty('--back-x', `${(x * 8).toFixed(2)}px`);
+    heroStage.style.setProperty('--back-y', `${(y * 8).toFixed(2)}px`);
+  });
+  heroStage.addEventListener('pointerleave', () => {
+    for (const property of ['--front-x','--front-y','--back-x','--back-y']) heroStage.style.setProperty(property, '0px');
+  });
+}
 setInterval(() => { if (!document.hidden) document.querySelector("#clock").textContent = `${new Date().toLocaleTimeString("en-GB", { timeZone: "UTC" })} UTC`; }, 1000);
 // Do not replace focused controls or shift the user's reading position during inspection.
 setInterval(() => { if (!paused && !document.hidden && !dialog.open && !document.querySelector('#main').contains(document.activeElement)) load(); }, 5000);

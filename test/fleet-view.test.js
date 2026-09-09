@@ -57,10 +57,16 @@ test('static UI contract preserves semantic order, safety labels and motion fall
   assert.match(html,/class="hero-route-signature"/);
   assert.match(css,/Night Dispatch Studio/);
   const pastelCss=readFileSync(new URL('../public/pastel-orbit.css',import.meta.url),'utf8');
+  const figmaHeroCss=readFileSync(new URL('../public/figma-hero.css',import.meta.url),'utf8');
   assert.match(pastelCss,/Pastel Route Orbit/);
   assert.match(html,/class="pastel-orbit"/);
   assert.match(html,/class="route-pass route-pass--rear"/);
+  assert.match(html,/data-ui-version="pastel-orbit-37-430"/);
   assert.match(pastelCss,/@media\(prefers-reduced-motion:reduce\)/);
+  assert.match(figmaHeroCss,/Figma node 37:430 adaptation/);
+  assert.match(figmaHeroCss,/\.mockup-map/);
+  assert.match(app,/heroStage\.addEventListener\('pointermove'/);
+  assert.match(figmaHeroCss,/@media\(prefers-reduced-motion:reduce\)/);
   assert.match(css,/prefers-reduced-motion:reduce/);
   assert.doesNotMatch(html,/figma\.com\/api\/mcp\/asset/);
   assert.match(app,/window.confirm\(t\('confirmFault'\)\)/);
@@ -69,7 +75,7 @@ test('static UI contract preserves semantic order, safety labels and motion fall
 });
 
 test('initial frontend assets stay under the 150 KiB raw and 45 KiB gzip budgets', () => {
-  const assets=['index.html','styles.css','studio.css','pastel-orbit.css','app.js','fleet-view.js'].map(name=>readFileSync(new URL(`../public/${name}`,import.meta.url)));
+  const assets=['index.html','styles.css','studio.css','pastel-orbit.css','figma-hero.css','app.js','fleet-view.js'].map(name=>readFileSync(new URL(`../public/${name}`,import.meta.url)));
   assert.ok(assets.reduce((n,b)=>n+b.length,0)<150*1024);
   assert.ok(assets.reduce((n,b)=>n+gzipSync(b).length,0)<45*1024);
 });

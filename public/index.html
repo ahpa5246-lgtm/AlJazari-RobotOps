@@ -8,14 +8,19 @@
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/studio.css">
     <link rel="stylesheet" href="/pastel-orbit.css">
+    <link rel="stylesheet" href="/figma-hero.css?v=37-430">
   </head>
-  <body>
+  <body data-ui-version="pastel-orbit-37-430">
     <a class="skip-link" href="#main">Skip to fleet command</a>
     <header class="topbar">
       <div class="brand" aria-label="Parcel Grid delivery fleet monitor">
         <span class="brand-mark" aria-hidden="true">PG</span>
         <span><strong>PARCEL GRID</strong><small data-i18n="product">DELIVERY FLEET INTELLIGENCE</small></span>
       </div>
+      <nav class="workspace-nav" aria-label="Workspace">
+        <a href="#main" data-i18n="navOverview">Overview</a><a href="#fleet-title" data-i18n="navFleet">Robot library</a><a href="#evidence-title" data-i18n="navEvidence">Evidence desk</a><a href="#mission-analytics-title" data-i18n="navMissions">Mission ledger</a>
+        <span class="nav-note" data-i18n="monitorOnly">MONITORING ONLY</span>
+      </nav>
       <div class="topbar-status">
         <span class="simulated-label">SIMULATED DATA</span>
         <button id="language" class="text-button" type="button">العربية</button>
@@ -23,10 +28,6 @@
       </div>
     </header>
 
-    <nav class="workspace-nav" aria-label="Workspace">
-      <a href="#main" data-i18n="navOverview">Overview</a><a href="#fleet-title" data-i18n="navFleet">Robot library</a><a href="#evidence-title" data-i18n="navEvidence">Evidence desk</a><a href="#mission-analytics-title" data-i18n="navMissions">Mission ledger</a>
-      <span class="nav-note" data-i18n="monitorOnly">MONITORING ONLY</span>
-    </nav>
     <div class="session-bar"><span data-i18n="sessionTitle">THE OPERATIONS STUDIO</span><div><button id="refresh-mode" type="button" aria-pressed="false">Pause updates</button><button id="refresh-now" type="button">Refresh</button><span id="connection-state" role="status"></span></div></div>
     <main id="main" class="command-shell" tabindex="-1">
       <section class="mission-rail" aria-labelledby="mission-title">
@@ -50,7 +51,11 @@
         </div>
         <div class="specimen-caption"><span data-i18n="specimen">DELIVERY UNIT / 01</span><span data-i18n="illustration">Illustrative parcel carrier · not hardware geometry</span></div>
         <div class="route-pass route-pass--rear" aria-hidden="true">
-          <span>ROUTE / LIVE</span><i></i><b>PICKUP</b><i></i><b>DROP</b>
+          <span class="mockup-kicker">ROUTE / LIVE</span>
+          <strong>Parcel path</strong>
+          <div class="mockup-map"><i></i><i></i><i></i><i></i></div>
+          <div class="mockup-stops"><b>PICKUP</b><span>→</span><b>DROP-OFF</b></div>
+          <small>SIMULATED ROUTE EVIDENCE</small>
         </div>
         <div class="robot-sculpture" aria-hidden="true">
           <svg viewBox="0 0 560 400" role="presentation">
@@ -60,24 +65,24 @@
               <linearGradient id="pedestal" x2="0" y2="1"><stop stop-color="#32e6ff"/><stop offset="1" stop-color="#5d38ff"/></linearGradient>
             </defs>
             <g fill="none" stroke="#c8d1d4"><ellipse cx="280" cy="330" rx="205" ry="54"/><ellipse cx="280" cy="330" rx="240" ry="70" stroke-dasharray="3 9"/><path d="M40 330h480M280 260v140"/></g>
-            <path d="M147 305v30c0 44 266 44 266 0v-30" fill="url(#pedestal)"/><ellipse cx="280" cy="305" rx="133" ry="37" fill="#fffdf8" stroke="#c9b98f"/>
+            <path d="M147 305v30c0 44 266 44 266 0v-30" fill="url(#pedestal)"/><ellipse cx="280" cy="305" rx="133" ry="37" fill="#ffffff" stroke="#bac7ef"/>
             <ellipse cx="288" cy="304" rx="73" ry="15" fill="#274b60" opacity=".14"/>
             <g class="robot-body">
               <rect x="221" y="272" width="22" height="38" rx="9" fill="#273944"/><rect x="317" y="272" width="22" height="38" rx="9" fill="#273944"/>
-              <path d="M232 171Q280 147 328 171l17 100q-6 31-65 32t-65-32Z" fill="url(#shell)" stroke="#c9b98f"/>
+              <path d="M232 171Q280 147 328 171l17 100q-6 31-65 32t-65-32Z" fill="url(#shell)" stroke="#bac7ef"/>
               <path d="M227 190q52 18 106 0M222 244q56 22 116 0" fill="none" stroke="#d8cdb7"/>
-              <rect x="260" y="224" width="40" height="5" rx="2.5" fill="#f2a71b"/>
-              <path d="M224 181q-25-5-30 16l-9 43q-1 20 17 20l17-8" fill="url(#shell)" stroke="#c9b98f"/>
-              <path d="M334 181q25-5 30 16l9 43q1 20-17 20l-17-8" fill="url(#shell)" stroke="#c9b98f"/>
+              <rect x="260" y="224" width="40" height="5" rx="2.5" fill="#ed83ca"/>
+              <path d="M224 181q-25-5-30 16l-9 43q-1 20 17 20l17-8" fill="url(#shell)" stroke="#bac7ef"/>
+              <path d="M334 181q25-5 30 16l9 43q1 20-17 20l-17-8" fill="url(#shell)" stroke="#bac7ef"/>
               <rect x="260" y="151" width="40" height="21" rx="8" fill="#8aa6b6"/>
-              <path d="M208 91q1-39 70-42t75 43l-2 47q-2 30-72 31t-72-31Z" fill="url(#shell)" stroke="#c9b98f"/>
+              <path d="M208 91q1-39 70-42t75 43l-2 47q-2 30-72 31t-72-31Z" fill="url(#shell)" stroke="#bac7ef"/>
               <rect x="219" y="86" width="121" height="55" rx="24" fill="url(#visor)"/>
-              <g class="robot-eyes" fill="#ffe3a3"><rect x="246" y="103" width="12" height="20" rx="6"/><rect x="303" y="103" width="12" height="20" rx="6"/></g>
-              <path d="M277 44V27" stroke="#3978a8" stroke-width="5"/><circle cx="277" cy="23" r="7" fill="#f2a71b"/>
-              <rect x="242" y="176" width="76" height="50" rx="7" fill="#f2b544" stroke="#b67408"/>
-              <path d="M242 192h76M280 176v50" stroke="#fff2cf"/>
+              <g class="robot-eyes" fill="#baf2ff"><rect x="246" y="103" width="12" height="20" rx="6"/><rect x="303" y="103" width="12" height="20" rx="6"/></g>
+              <path d="M277 44V27" stroke="#6d75ef" stroke-width="5"/><circle cx="277" cy="23" r="7" fill="#ed83ca"/>
+              <rect x="242" y="176" width="76" height="50" rx="7" fill="#d78bdf" stroke="#705fe1"/>
+              <path d="M242 192h76M280 176v50" stroke="#f8ebff"/>
             </g>
-            <g fill="none" stroke="#3978a8"><path d="M335 99h84v-23h30"/><circle cx="335" cy="99" r="3" fill="#f2a71b"/><path d="M221 226H137v20H98"/><circle cx="221" cy="226" r="3" fill="#f2a71b"/></g>
+            <g fill="none" stroke="#6d75ef"><path d="M335 99h84v-23h30"/><circle cx="335" cy="99" r="3" fill="#ed83ca"/><path d="M221 226H137v20H98"/><circle cx="221" cy="226" r="3" fill="#63cfe8"/></g>
           </svg><span class="specimen-index">PG / D</span><span class="parcel-token">□</span>
         </div>
         <div class="specimen-footer"><div><p class="eyebrow" data-i18n="selectedRobot">SELECTED ROBOT</p><h2 id="specimen-title">—</h2><p id="specimen-subtitle"></p></div><button id="inspect-selected" type="button" disabled data-i18n="openPassport">Open passport ↗</button></div>
