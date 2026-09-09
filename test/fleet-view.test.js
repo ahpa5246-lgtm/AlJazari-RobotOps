@@ -54,6 +54,10 @@ test('static UI contract preserves semantic order, safety labels and motion fall
   assert.match(css,/:focus-visible/);
   assert.match(css,/max-width:760px/);
   assert.match(css,/\[dir=rtl\]/);
+  assert.match(html,/class="hero-route-signature"/);
+  assert.match(css,/Night Dispatch Studio/);
+  assert.match(css,/prefers-reduced-motion:reduce/);
+  assert.doesNotMatch(html,/figma\.com\/api\/mcp\/asset/);
   assert.match(app,/window.confirm\(t\('confirmFault'\)\)/);
   assert.match(app,/document.hidden/);
   assert.match(app,/scope="row"/);

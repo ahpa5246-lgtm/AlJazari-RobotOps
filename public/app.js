@@ -26,8 +26,8 @@ function t(key) { return copy[language][key] ?? key; }
 
 Object.assign(copy.en, { inspecting: 'Reading mode · automatic updates held', capabilitiesLabel: 'Capability discovery', battery: 'Battery', motors: 'Motors', sensors: 'Sensors', network: 'Network', pose: 'Position', missions: 'Missions', connectivity: 'Connectivity', healthBasis: 'Inside the health score', healthExplanation: 'health-v1 · weighted mean: battery 30%, motors 30%, sensors 20%, connectivity 20%. Unsupported components are excluded; the remaining weights are normalized. Not a failure probability.', faultSafety: 'This changes simulator data only. It cannot control a physical robot.', confirmFault: 'Inject a network fault into this simulated robot?', backRobot: '← Robot passport', actionFailed: 'The action failed. No success has been confirmed. Close and retry.', metric: 'Signal', threshold: 'Value / threshold', baseline: 'Baseline mean', zscore: 'Z-score' });
 Object.assign(copy.ar, { inspecting: 'وضع القراءة · التحديث التلقائي معلّق', capabilitiesLabel: 'اكتشاف القدرات', battery: 'البطارية', motors: 'المحركات', sensors: 'الحساسات', network: 'الشبكة', pose: 'الموقع', missions: 'المهام', connectivity: 'الاتصال', healthBasis: 'داخل مؤشر الصحة', healthExplanation: 'health-v1 · متوسط مرجّح: البطارية ٣٠٪، المحركات ٣٠٪، الحساسات ٢٠٪، الاتصال ٢٠٪. تُستبعد المكونات غير المدعومة وتُعاد موازنة البقية. ليس احتمال عطل.', faultSafety: 'يغيّر هذا بيانات المحاكي فقط؛ لا يمكنه التحكم بروبوت حقيقي.', confirmFault: 'هل تؤكدين حقن عطل شبكة في هذا الروبوت المحاكى؟', backRobot: '← ملف الروبوت', actionFailed: 'تعذّر الإجراء ولم يُؤكَّد نجاحه. أغلقي النافذة وأعيدي المحاولة.', metric: 'الإشارة', threshold: 'القيمة / العتبة', baseline: 'متوسط الأساس', zscore: 'درجة Z' });
-Object.assign(copy.en, { parcel: 'Parcel', route: 'Route', pickup: 'Pickup', dropoff: 'Drop-off', payload: 'Payload', capacity: 'Capacity', deliveryException: 'Delivery exception', routeProgress: 'Route progress' });
-Object.assign(copy.ar, { parcel: 'الطرد', route: 'المسار', pickup: 'الاستلام', dropoff: 'التسليم', payload: 'الحمولة', capacity: 'السعة', deliveryException: 'استثناء التوصيل', routeProgress: 'تقدم المسار' });
+Object.assign(copy.en, { parcel: 'Parcel', route: 'Route', pickup: 'Pickup', sort: 'Sort', transit: 'Transit', dropoff: 'Drop-off', routeJourney: 'Parcel route: pickup, sort, transit, drop-off', payload: 'Payload', capacity: 'Capacity', deliveryException: 'Delivery exception', routeProgress: 'Route progress' });
+Object.assign(copy.ar, { parcel: 'الطرد', route: 'المسار', pickup: 'الاستلام', sort: 'الفرز', transit: 'العبور', dropoff: 'التسليم', routeJourney: 'مسار الطرد: الاستلام، الفرز، العبور، التسليم', payload: 'الحمولة', capacity: 'السعة', deliveryException: 'استثناء التوصيل', routeProgress: 'تقدم المسار' });
 
 async function load() {
   if (loading) { reloadRequested = true; return; }
@@ -105,6 +105,7 @@ function renderCopy() {
   document.querySelectorAll("[data-i18n]").forEach((element) => { element.textContent = t(element.dataset.i18n); });
   document.querySelector("#language").textContent = language === "en" ? "العربية" : "English";
   document.querySelector('#search').placeholder = t('searchPlaceholder');
+  document.querySelector('.hero-route-signature').setAttribute('aria-label', t('routeJourney'));
   document.querySelector('.dialog-close').setAttribute('aria-label', t('close'));
   document.querySelector('#robot-dialog').setAttribute('aria-label', t('evidence'));
   for (const option of status.options) option.textContent = t(option.value || 'all');

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f7f4ec">
+    <meta name="theme-color" content="#0e0d17">
     <title>Parcel Grid — Delivery Fleet Monitor</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/studio.css">
@@ -33,6 +33,9 @@
         <h1 id="mission-title" data-i18n="title">Every parcel has a path.</h1>
         <p class="lede" data-i18n="lede">Follow pickup, route and drop-off evidence across a fictional fleet of parcel-delivery robots. Unsupported signals remain visibly unavailable.</p>
         <a class="primary-link" href="#fleet-title"><span data-i18n="explore">Explore the fleet</span><span aria-hidden="true">↗</span></a>
+        <div class="hero-route-signature" aria-label="Parcel route: pickup, sort, transit, drop-off">
+          <span data-i18n="pickup">Pickup</span><i aria-hidden="true"></i><span data-i18n="sort">Sort</span><i aria-hidden="true"></i><span data-i18n="transit">Transit</span><i aria-hidden="true"></i><span data-i18n="dropoff">Drop-off</span>
+        </div>
         <div id="metrics" class="metrics" aria-label="Fleet summary"></div>
       </section>
 
@@ -41,9 +44,9 @@
         <div class="robot-sculpture" aria-hidden="true">
           <svg viewBox="0 0 560 400" role="presentation">
             <defs>
-              <linearGradient id="shell" x1="0" x2="1" y2=".7"><stop stop-color="#fff"/><stop offset=".55" stop-color="#f4eee1"/><stop offset="1" stop-color="#e2cfaa"/></linearGradient>
-              <linearGradient id="visor" x2="0" y2="1"><stop stop-color="#17497a"/><stop offset="1" stop-color="#102b46"/></linearGradient>
-              <linearGradient id="pedestal" x2="0" y2="1"><stop stop-color="#f7d58e"/><stop offset="1" stop-color="#e2a434"/></linearGradient>
+              <linearGradient id="shell" x1="0" x2="1" y2=".7"><stop stop-color="#ffffff"/><stop offset=".52" stop-color="#d9eeff"/><stop offset="1" stop-color="#9d8cff"/></linearGradient>
+              <linearGradient id="visor" x2="0" y2="1"><stop stop-color="#102f61"/><stop offset="1" stop-color="#080b18"/></linearGradient>
+              <linearGradient id="pedestal" x2="0" y2="1"><stop stop-color="#32e6ff"/><stop offset="1" stop-color="#5d38ff"/></linearGradient>
             </defs>
             <g fill="none" stroke="#c8d1d4"><ellipse cx="280" cy="330" rx="205" ry="54"/><ellipse cx="280" cy="330" rx="240" ry="70" stroke-dasharray="3 9"/><path d="M40 330h480M280 260v140"/></g>
             <path d="M147 305v30c0 44 266 44 266 0v-30" fill="url(#pedestal)"/><ellipse cx="280" cy="305" rx="133" ry="37" fill="#fffdf8" stroke="#c9b98f"/>

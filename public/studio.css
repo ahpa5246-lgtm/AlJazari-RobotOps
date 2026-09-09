@@ -119,3 +119,304 @@ button { min-height:44px; }
 .robot-id,.evidence strong { overflow-wrap:anywhere; }
 .robot-specimen { min-width:0; }
 @media(max-width:370px){.health-components label{grid-template-columns:1fr 1fr 3ch;gap:.4rem}}
+
+/* Night Dispatch Studio — adapted from the supplied Figma composition language.
+   Original logistics composition: no reference artwork, logo or trade dress is copied. */
+:root {
+  color-scheme: dark;
+  --canvas:#0e0d17;
+  --surface:#151725;
+  --surface-2:#1c2031;
+  --ink:#f8f8fb;
+  --muted:#aeb4c5;
+  --edge:rgba(230,239,255,.14);
+  --signal:#6de7ff;
+  --cyan:#6de7ff;
+  --warning:#d8ff52;
+  --critical:#ff6b72;
+  --focus:#d8ff52;
+  --route:#765dff;
+}
+
+html { background:var(--canvas); }
+body {
+  position:relative;
+  isolation:isolate;
+  min-height:100vh;
+  background:
+    radial-gradient(58rem 42rem at 15% 4%,rgba(11,154,164,.42),transparent 64%),
+    radial-gradient(54rem 38rem at 88% 20%,rgba(91,45,255,.35),transparent 67%),
+    linear-gradient(145deg,#0a111a 0%,#0e0d17 48%,#121025 100%);
+  color:var(--ink);
+}
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.22;
+  background-image:
+    radial-gradient(circle at 20% 30%,#fff 0 .45px,transparent .65px),
+    radial-gradient(circle at 70% 65%,#fff 0 .4px,transparent .6px);
+  background-size:5px 5px,7px 7px;
+  mix-blend-mode:soft-light;
+}
+
+.topbar {
+  position:relative;
+  min-height:86px;
+  padding:1rem clamp(1rem,4vw,4rem);
+  color:var(--ink);
+  background:rgba(9,12,23,.7);
+  border-bottom:1px solid var(--edge);
+  backdrop-filter:blur(18px);
+}
+.brand-mark {
+  width:48px;
+  height:48px;
+  color:#0b0d17;
+  background:linear-gradient(145deg,#d8ff52 0%,#6de7ff 54%,#765dff 100%);
+  border:1px solid rgba(255,255,255,.45);
+  border-radius:14px 14px 5px 14px;
+  box-shadow:0 16px 38px rgba(70,207,239,.18);
+  clip-path:none;
+}
+.brand strong { color:#fff; }
+.brand small,.topbar-status { color:var(--muted); }
+.simulated-label {
+  color:#111421;
+  background:var(--warning);
+  border:0;
+  border-radius:999px;
+  box-shadow:0 0 0 1px rgba(216,255,82,.25),0 8px 22px rgba(216,255,82,.12);
+}
+.text-button,.session-bar button {
+  color:var(--ink);
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--edge);
+}
+.text-button:hover,.session-bar button:hover { background:rgba(255,255,255,.11); }
+
+.workspace-nav {
+  min-height:54px;
+  background:rgba(11,13,25,.6);
+  border-bottom:1px solid var(--edge);
+  backdrop-filter:blur(16px);
+}
+.workspace-nav a { min-height:54px;color:var(--muted); }
+.workspace-nav a:hover,.workspace-nav a:first-child { color:#fff;border-color:var(--signal); }
+.nav-note { color:var(--warning); }
+.session-bar { padding-top:1.25rem;color:#c4cada; }
+.session-bar>div {
+  padding:.35rem;
+  border:1px solid var(--edge);
+  border-radius:999px;
+  background:rgba(255,255,255,.04);
+}
+.session-bar button { border-radius:999px; }
+
+.command-shell {
+  position:relative;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+  grid-template-areas:"mission specimen" "topology evidence" "fleet fleet" "analytics analytics";
+  gap:clamp(1.1rem,2.2vw,2.2rem);
+  padding-top:1.5rem;
+}
+.command-shell::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:3rem 5% auto 42%;
+  height:34rem;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(70,213,255,.18),rgba(96,45,255,.08) 48%,transparent 70%);
+  filter:blur(20px);
+}
+.mission-rail {
+  position:relative;
+  min-height:520px;
+  justify-content:center;
+  padding:3rem clamp(.25rem,2vw,2rem) 2rem 0;
+}
+.mission-rail::after {
+  content:"PG / DISPATCH 01";
+  position:absolute;
+  inset-inline-start:0;
+  bottom:.35rem;
+  color:rgba(255,255,255,.34);
+  font:.6rem var(--mono);
+  letter-spacing:.18em;
+}
+.eyebrow { color:var(--warning); }
+h1 {
+  max-width:9.4ch;
+  color:#fff;
+  font-size:clamp(3.7rem,6.3vw,6.8rem);
+  font-weight:680;
+  line-height:.92;
+  letter-spacing:-.074em;
+  text-wrap:balance;
+}
+.lede { color:#c1c7d4;font-size:1rem; }
+.primary-link {
+  color:#0e0d17;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:999px;
+  box-shadow:0 14px 38px rgba(0,0,0,.18);
+  transition:transform 180ms ease,box-shadow 180ms ease,background 180ms ease;
+}
+.primary-link:hover { color:#0e0d17;background:var(--warning);transform:translateY(-2px);box-shadow:0 18px 50px rgba(216,255,82,.15); }
+.hero-route-signature {
+  width:min(100%,38rem);
+  display:grid;
+  grid-template-columns:auto 1fr auto 1fr auto 1fr auto;
+  align-items:center;
+  gap:.6rem;
+  margin-top:2rem;
+  color:#dfe4ee;
+  font:.62rem var(--mono);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.hero-route-signature i { height:1px;background:linear-gradient(90deg,var(--signal),var(--route));position:relative; }
+.hero-route-signature i::after { content:"";position:absolute;inset-inline-end:-2px;top:-3px;width:7px;height:7px;border-radius:50%;background:var(--warning);box-shadow:0 0 14px rgba(216,255,82,.7); }
+[dir=rtl] .hero-route-signature { direction:rtl; }
+.metrics { border-color:var(--edge); }
+.metric { border-color:var(--edge); }
+.metric strong { color:#fff; }
+.metric span { color:var(--muted); }
+
+.specimen-panel {
+  position:relative;
+  min-height:530px;
+  align-self:center;
+  color:#f7f8ff;
+  background:
+    radial-gradient(24rem 18rem at 68% 32%,rgba(55,231,255,.7),transparent 48%),
+    radial-gradient(25rem 22rem at 18% 82%,rgba(126,53,255,.86),transparent 57%),
+    linear-gradient(145deg,#202b78 0%,#134b7c 36%,#28127d 100%);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:30px;
+  transform:rotate(1.25deg);
+  box-shadow:0 36px 90px rgba(0,0,0,.35),0 0 80px rgba(73,99,255,.16);
+  overflow:hidden;
+}
+.specimen-panel::before {
+  content:"";
+  position:absolute;
+  inset:-22% -15% 25% 34%;
+  border:1px solid rgba(255,255,255,.17);
+  border-radius:50%;
+  transform:rotate(-16deg);
+  box-shadow:0 0 0 24px rgba(255,255,255,.025),0 0 0 54px rgba(255,255,255,.018);
+}
+.specimen-caption { position:relative;z-index:1;color:#e8ebff; }
+.specimen-caption span:last-child { color:#d7def3; }
+.robot-sculpture { z-index:1;filter:drop-shadow(0 28px 32px rgba(0,0,0,.28)); }
+.robot-sculpture svg { max-height:350px; }
+.robot-sculpture svg>g:first-of-type { opacity:.36; }
+.specimen-index { color:rgba(255,255,255,.62); }
+.specimen-footer { position:relative;z-index:2;border-color:rgba(255,255,255,.25); }
+.specimen-footer p { color:#d2d9ee; }
+.specimen-footer button { color:#151528;background:#fff;border:0;border-radius:999px; }
+
+.topology-panel,.evidence-panel,.mission-analytics-panel,.fleet-panel {
+  color:var(--ink);
+  background:linear-gradient(145deg,rgba(28,32,49,.94),rgba(14,15,27,.96));
+  border:1px solid var(--edge);
+  border-radius:24px;
+  box-shadow:0 24px 70px rgba(0,0,0,.2);
+}
+.topology-panel { transform:rotate(-.25deg); }
+.evidence-panel { transform:rotate(.35deg) translateY(1.1rem); }
+.panel-heading { border-color:var(--edge); }
+.panel-heading h2 { color:#fff;font-size:1.35rem; }
+.microcopy,.scope-note { color:var(--muted); }
+.topology-stage { background:transparent; }
+.fleet-atlas { gap:1.15rem; }
+.site-island {
+  color:#fff;
+  background:linear-gradient(155deg,rgba(109,231,255,.12),rgba(118,93,255,.08));
+  border:1px solid rgba(181,205,255,.15);
+  border-bottom:3px solid var(--signal);
+  border-radius:18px 18px 40px 18px;
+}
+.site-island:nth-child(2) { background:linear-gradient(155deg,rgba(216,255,82,.11),rgba(118,93,255,.1));border-bottom-color:var(--warning); }
+.site-island p,.canvas-summary,.topology-key { color:var(--muted); }
+.atlas-node {
+  color:#fff;
+  background:rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.18);
+  border-radius:12px 12px 24px 12px;
+}
+.atlas-node[aria-pressed=true] { color:#0c1020;background:var(--signal);border-color:var(--signal);box-shadow:0 8px 24px rgba(109,231,255,.26); }
+.evidence-list { scrollbar-color:var(--route) transparent; }
+.evidence { border-color:var(--edge); }
+.evidence p,.evidence dt { color:var(--muted); }
+.evidence::before { background:var(--warning);box-shadow:0 0 16px rgba(216,255,82,.48); }
+
+.filters input,.filters select {
+  color:var(--ink);
+  background:rgba(255,255,255,.06);
+  border-color:var(--edge);
+}
+.comparison-toolbar { border-top:1px solid var(--edge); }
+.comparison-toolbar p { color:var(--muted); }
+.comparison-toolbar button { color:var(--ink);background:rgba(255,255,255,.06);border-color:var(--edge);border-radius:999px; }
+.fleet-table { background:var(--edge);border-color:var(--edge); }
+.robot-specimen,.robot-row { color:var(--ink);background:#151725; }
+.robot-row:hover { background:linear-gradient(145deg,rgba(109,231,255,.1),rgba(118,93,255,.08)); }
+.robot-row p,.health-line span { color:var(--muted); }
+.delivery-strip { color:var(--ink);background:rgba(216,255,82,.07);border-color:var(--warning); }
+.delivery-strip--idle { background:rgba(255,255,255,.045);border-color:var(--muted); }
+.robot-mini { border-color:rgba(255,255,255,.25);background:linear-gradient(145deg,#c8f6ff,#a697ff); }
+.robot-mini::before { background:#151725; }
+.compare-toggle { color:var(--muted);border-color:var(--edge);background:transparent; }
+.compare-toggle[aria-pressed=true] { color:var(--warning);background:rgba(216,255,82,.07);border-color:var(--warning); }
+.mission-rate-grid { border-color:var(--edge); }
+.mission-rate-grid article { background:transparent;border-color:var(--edge); }
+.mission-ledger-evidence { background:rgba(255,255,255,.04); }
+.studio-footer { color:var(--muted); }
+
+dialog { color:var(--ink);background:#151725;border-color:rgba(109,231,255,.35);box-shadow:0 28px 110px rgba(0,0,0,.58); }
+dialog::backdrop { background:rgba(5,6,13,.78);backdrop-filter:blur(10px); }
+.dialog-close { color:#fff;background:#0e0d17;border-color:var(--edge); }
+.detail-grid { border-color:var(--edge); }
+.detail-grid div,.incident-timeline,.incident-event,.mission-events,.mission-events li,.mission-records,.mission-records article { border-color:var(--edge); }
+.health-explainer,.diagnostic-window,.diagnostic-hypothesis,.mission-current,.replay-summary { background:rgba(255,255,255,.045); }
+.capabilities span { border-color:var(--edge); }
+.comparison-table th,.comparison-table td { border-color:var(--edge); }
+.comparison-table thead { background:rgba(109,231,255,.08); }
+.skeleton { background:rgba(255,255,255,.04); }
+.fleet-table>.empty { background:#151725; }
+
+@media(max-width:1120px) {
+  .specimen-panel { transform:rotate(.6deg); }
+  .evidence-panel { transform:none; }
+}
+@media(max-width:760px) {
+  body { background:radial-gradient(35rem 30rem at 15% 2%,rgba(11,154,164,.3),transparent 62%),var(--canvas); }
+  .topbar,.workspace-nav { backdrop-filter:none; }
+  .command-shell { padding-top:.5rem; }
+  .mission-rail { min-height:auto;padding-bottom:3rem; }
+  h1,.mission-rail h1 { font-size:clamp(3.35rem,15vw,5.2rem); }
+  .hero-route-signature { font-size:.54rem;gap:.35rem; }
+  .specimen-panel,.topology-panel { transform:none; }
+  .specimen-panel { min-height:470px;border-radius:22px 22px 52px 22px; }
+  .metrics { overflow-x:auto;scroll-snap-type:x proximity; }
+  .metric { min-width:86px;scroll-snap-align:start; }
+}
+@media(max-width:370px) {
+  .hero-route-signature span:nth-of-type(2),.hero-route-signature i:nth-of-type(2) { display:none; }
+  .hero-route-signature { grid-template-columns:auto 1fr auto 1fr auto; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .primary-link:hover,.specimen-panel,.topology-panel,.evidence-panel { transform:none; }
+}
+@media print {
+  body { color:#111;background:#fff; }
+  body::before,.command-shell::before,.hero-route-signature { display:none; }
+  .topology-panel,.evidence-panel,.mission-analytics-panel,.fleet-panel { color:#111;background:#fff;box-shadow:none;border-color:#bbb;transform:none; }
+}
