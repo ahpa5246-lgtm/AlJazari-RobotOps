@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0e0d17">
+    <meta name="theme-color" content="#ffffff">
     <title>Parcel Grid — Delivery Fleet Monitor</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/studio.css">
+    <link rel="stylesheet" href="/pastel-orbit.css">
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to fleet command</a>
@@ -40,7 +41,17 @@
       </section>
 
       <section class="specimen-panel" aria-labelledby="specimen-title">
+        <div class="pastel-orbit" aria-hidden="true">
+          <span class="orb orb-cyan"></span>
+          <span class="orb orb-pink"></span>
+          <span class="orb orb-lilac"></span>
+          <span class="soft-form soft-form-one"></span>
+          <span class="soft-form soft-form-two"></span>
+        </div>
         <div class="specimen-caption"><span data-i18n="specimen">DELIVERY UNIT / 01</span><span data-i18n="illustration">Illustrative parcel carrier · not hardware geometry</span></div>
+        <div class="route-pass route-pass--rear" aria-hidden="true">
+          <span>ROUTE / LIVE</span><i></i><b>PICKUP</b><i></i><b>DROP</b>
+        </div>
         <div class="robot-sculpture" aria-hidden="true">
           <svg viewBox="0 0 560 400" role="presentation">
             <defs>
@@ -67,7 +78,7 @@
               <path d="M242 192h76M280 176v50" stroke="#fff2cf"/>
             </g>
             <g fill="none" stroke="#3978a8"><path d="M335 99h84v-23h30"/><circle cx="335" cy="99" r="3" fill="#f2a71b"/><path d="M221 226H137v20H98"/><circle cx="221" cy="226" r="3" fill="#f2a71b"/></g>
-          </svg><span class="specimen-index">PG / D</span>
+          </svg><span class="specimen-index">PG / D</span><span class="parcel-token">□</span>
         </div>
         <div class="specimen-footer"><div><p class="eyebrow" data-i18n="selectedRobot">SELECTED ROBOT</p><h2 id="specimen-title">—</h2><p id="specimen-subtitle"></p></div><button id="inspect-selected" type="button" disabled data-i18n="openPassport">Open passport ↗</button></div>
       </section>

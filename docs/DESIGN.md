@@ -1,4 +1,4 @@
-# Parcel Grid — Night Dispatch delivery workspace
+# Parcel Grid — Pastel Route Orbit delivery workspace
 
 Status: implementation delivered for review; browser visual acceptance remains open.
 
@@ -14,6 +14,8 @@ Principles:
 - Every operation has a semantic control; the visual treatment supports inspection instead of replacing it.
 
 Anti-goals: real-company affiliation, copied trade dress, all-glass interfaces, decorative fake telemetry, scroll hijacking, continuous animation, external design assets, overlapping rendering libraries.
+
+The current visual thesis is a white spatial canvas with softly modelled cyan, pink and lilac route bodies. Two tilted operational surfaces represent a route passport and delivery unit—not generic phone mockups—and retain live product content. Motion is limited to three slow transform-only floats with a complete reduced-motion fallback.
 
 ## Tokens and typography
 
